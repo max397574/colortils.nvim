@@ -16,4 +16,6 @@ P = function(...)
     end
     return ...
 end
+-- TODO: Try to fix problem with log
+vim.g.running_from_colortils_test=true
 EOF

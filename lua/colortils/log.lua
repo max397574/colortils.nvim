@@ -34,6 +34,12 @@ local default_config = {
     float_precision = 0.01,
 }
 
+-- TODO: Try to fix problem with log
+-- reference: https://github.com/max397574/colortils.nvim/runs/6658071550?check_suite_focus=true#step:5:22
+if vim.g.running_from_colortils_test then
+    default_config.use_file = false
+end
+
 -- {{{ NO NEED TO CHANGE
 local log = {}
 
