@@ -31,3 +31,42 @@ describe("Get blocks", function()
         )
     end)
 end)
+
+describe("Validate Color Codes", function()
+    it("Check invalid number code", function()
+        assert.equals(
+            require("colortils.utils").validate_color_numbers("FF003X"),
+            false
+        )
+    end)
+    it("Check too short number code", function()
+        assert.equals(
+            require("colortils.utils").validate_color_numbers("FF030"),
+            false
+        )
+    end)
+    it("Check invalid complete code", function()
+        assert.equals(
+            require("colortils.utils").validate_color_numbers("#FF003X"),
+            false
+        )
+    end)
+    it("Check too short complete code", function()
+        assert.equals(
+            require("colortils.utils").validate_color_numbers("#FF030"),
+            false
+        )
+    end)
+    it("Check valid number code", function()
+        assert.equals(
+            require("colortils.utils").validate_color_numbers("FF00AB"),
+            true
+        )
+    end)
+    it("Check valid complete code", function()
+        assert.equals(
+            require("colortils.utils").validate_color_complete("#FF00AB"),
+            true
+        )
+    end)
+end)
