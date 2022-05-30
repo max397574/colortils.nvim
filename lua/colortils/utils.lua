@@ -35,4 +35,20 @@ utils.get_bar = function(value, max_value, max_width)
         )
 end
 
+utils.validate_color_complete = function(color)
+    if color:match("^#%x%x%x%x%x%x$") then
+        return true
+    else
+        return false
+    end
+end
+
+utils.validate_color_numbers = function(color)
+    if color:match("^%x%x%x%x%x%x$") then
+        return true
+    else
+        return false
+    end
+end
+
 return utils
