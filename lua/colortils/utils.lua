@@ -24,10 +24,14 @@ utils.get_partial_block = function(number)
     end
 end
 
-utils.get_bar = function(value, max_width)
-    return string.rep("█", math.floor(value / max_width))
+utils.get_bar = function(value, max_value, max_width)
+    -- get value of one block
+    local block_value = max_value / max_width
+    -- get amount of full blocks
+    local bar = string.rep("█", math.floor(value / block_value))
+    return bar
         .. utils.get_partial_block(
-            value / max_width - math.floor(value / max_width)
+            value / block_value - math.floor(value / block_value)
         )
 end
 
