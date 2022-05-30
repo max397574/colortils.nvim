@@ -137,7 +137,7 @@ end
 
 local commands = {
     ["picker"] = function(color)
-        if color and utils.validate_color(color) then
+        if color and utils.validate_color_numbers(color) then
             red = tonumber(color:sub(1, 2), 16)
             green = tonumber(color:sub(3, 4), 16)
             blue = tonumber(color:sub(5, 6), 16)
