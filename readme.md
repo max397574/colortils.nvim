@@ -1,7 +1,7 @@
 # 🎨 Colortils.nvim
 ### Color utils for neovim
 
-
+https://user-images.githubusercontent.com/81827001/171041720-6bc1fc72-dd82-4250-83ec-5c08c907c695.mov
 
 ## ✨ Features
 - Color picker with nice ui
@@ -37,3 +37,11 @@ require("colortils").setup({
 
 ## 👀 Demo
 
+#### Color Picker with "block"
+
+![Screenshot 2022-05-30 at 20 02 39](https://user-images.githubusercontent.com/81827001/171042127-6b7fe7f3-a95e-4ce7-b1ea-8026d3c03805.png)
+
+
+#### Color Picker with "hex"
+
+![Screenshot 2022-05-30 at 20 03 40](https://user-images.githubusercontent.com/81827001/171042234-295e9bbf-d093-491c-98e8-c753f23f6dd1.png)
