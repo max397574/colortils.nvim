@@ -1,5 +1,7 @@
 local utils = {}
 
+local log = require("colortils.log")
+
 utils.hex = function(number)
     return string.format("%02X", number)
 end
@@ -39,6 +41,7 @@ utils.validate_color_complete = function(color)
     if color:match("^#%x%x%x%x%x%x$") then
         return true
     else
+        log.warn("Invalid hex color")
         return false
     end
 end
@@ -47,6 +50,7 @@ utils.validate_color_numbers = function(color)
     if color:match("^%x%x%x%x%x%x$") then
         return true
     else
+        log.warn("Invalid hex color")
         return false
     end
 end
