@@ -56,7 +56,7 @@ end
 local function update_highlight()
     vim.api.nvim_set_hl(
         0,
-        "ColorPickerHighlight",
+        "ColorPickerPreview",
         { fg = "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue) }
     )
 end
@@ -75,7 +75,7 @@ local function right()
     end
     update_highlight()
     set_picker_lines()
-    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerHighlight", 4, 0, -1)
+    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
 end
 
 local function left()
@@ -92,7 +92,7 @@ local function left()
     end
     update_highlight()
     set_picker_lines()
-    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerHighlight", 4, 0, -1)
+    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
 end
 
 local function confirm()
@@ -136,7 +136,7 @@ colortils.color_picker = function()
     })
     update_highlight()
     set_picker_lines()
-    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerHighlight", 4, 0, -1)
+    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
 end
 
 local commands = {
