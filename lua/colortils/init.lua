@@ -141,6 +141,12 @@ end
 
 local commands = {
     ["picker"] = function(color)
+        if
+            not color
+            and utils.validate_color_numbers(vim.fn.expand("<cword>"))
+        then
+            color = vim.fn.expand("<cword>")
+        end
         if color and utils.validate_color_numbers(color) then
             red = tonumber(color:sub(1, 2), 16)
             green = tonumber(color:sub(3, 4), 16)
