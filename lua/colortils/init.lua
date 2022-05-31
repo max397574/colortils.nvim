@@ -2,8 +2,9 @@ local colortils = {}
 
 local settings = {
     register = "+",
-    ---String: "block"|"hex"
-    color_display = "block",
+    ---String: preview text. %s is color value
+    color_preview = "█ %s",
+    border = "rounded",
 }
 
 local utils = require("colortils.utils")
@@ -36,13 +37,16 @@ local function set_picker_lines()
         .. utils.get_bar(blue, 255, 15)
     table.insert(lines, blue_str)
     table.insert(lines, "")
-    if settings.color_display == "hex" then
+    if string.find(settings.color_preview, "%s") then
         table.insert(
             lines,
-            "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
+            string.format(
+                settings.color_preview,
+                "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
+            )
         )
-    elseif settings.color_display == "block" then
-        table.insert(lines, "█████")
+    else
+        table.insert(lines, settings.color_preview)
     end
     vim.api.nvim_buf_set_option(buf, "modifiable", true)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -128,7 +132,7 @@ colortils.color_picker = function()
         row = 0,
         style = "minimal",
         height = 5,
-        border = require("omega.utils").border(),
+        border = settings.border,
     })
     update_highlight()
     set_picker_lines()
