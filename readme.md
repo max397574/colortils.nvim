@@ -12,6 +12,7 @@ Use you favourite package manager and call the setup function.
 ```lua
 use {
   "max397574/colortils.nvim",
+  cmd = "Colortils",
   config = function()
     require("colortils").setup()
   end,
