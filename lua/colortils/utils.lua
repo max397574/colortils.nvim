@@ -1,5 +1,6 @@
 local utils = {}
 
+---@diagnostic disable-next-line: unused-local
 local log = require("colortils.log")
 
 --- Get the hex code of a number (two digits)
