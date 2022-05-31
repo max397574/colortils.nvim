@@ -1,6 +1,6 @@
 local colortils = {}
 
-local settings = {
+colortils.settings = {
     register = "+",
     ---String: preview text. %s is color value
     color_preview = "█ %s",
@@ -38,16 +38,16 @@ local function set_picker_lines()
         .. utils.get_bar(blue, 255, 15)
     table.insert(lines, blue_str)
     table.insert(lines, "")
-    if string.find(settings.color_preview, "%s") then
+    if string.find(colortils.settings.color_preview, "%s") then
         table.insert(
             lines,
             string.format(
-                settings.color_preview,
+                colortils.settings.color_preview,
                 "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
             )
         )
     else
-        table.insert(lines, settings.color_preview)
+        table.insert(lines, colortils.settings.color_preview)
     end
     vim.api.nvim_buf_set_option(buf, "modifiable", true)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -102,7 +102,7 @@ local function confirm()
     buf = nil
     win = nil
     vim.fn.setreg(
-        settings.register,
+        colortils.settings.register,
         "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
     )
 end
@@ -133,7 +133,7 @@ colortils.color_picker = function()
         row = 0,
         style = "minimal",
         height = 5,
-        border = settings.border,
+        border = colortils.settings.border,
     })
     update_highlight()
     set_picker_lines()
@@ -141,7 +141,8 @@ colortils.color_picker = function()
 end
 
 local commands = {
-    ["picker"] = function(color)
+    ["picker"] = function(args)
+        local color = args.fargs[2] or nil
         if
             not color
             and utils.validate_color_numbers(vim.fn.expand("<cword>"))
@@ -155,10 +156,15 @@ local commands = {
         end
         colortils.color_picker()
     end,
+    ["css"] = function(args)
+        if args.fargs[2] == "list" then
+            css.list_colors()
+        end
+    end,
 }
 
 local function exec_command(args)
-    commands[args.fargs[1]](args.fargs[2] or nil)
+    commands[args.fargs[1]](args)
 end
 
 local function create_command()
@@ -174,7 +180,11 @@ local function create_command()
 end
 
 colortils.setup = function(update)
-    settings = vim.tbl_deep_extend("force", settings, update or {})
+    colortils.settings = vim.tbl_deep_extend(
+        "force",
+        colortils.settings,
+        update or {}
+    )
     create_command()
 end
 

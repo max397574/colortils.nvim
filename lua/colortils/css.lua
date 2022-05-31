@@ -1,5 +1,6 @@
 local css = {}
 
+-- TODO: Try to make this a table without keys so it always has the same order
 local colors = {
     ["aliceblue"] = "#F0F8FF",
     ["antiquewhite"] = "#FAEBD7",
@@ -152,6 +153,47 @@ css.get_color = function(color)
     else
         return nil
     end
+end
+
+css.get_formated_colors = function()
+    local lines = {}
+    for name, color in pairs(colors) do
+        table.insert(
+            lines,
+            string.upper(
+                name:sub(1, 1)
+                    .. name:sub(2, -1)
+                    .. ":"
+                    .. string.rep(" ", 21 - #name)
+                    .. color
+            )
+        )
+    end
+    return lines
+end
+
+css.list_colors = function()
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, css.get_formated_colors())
+    vim.keymap.set("n", "q", "<cmd>q<CR>", { noremap = true, buffer = buf })
+    ---@diagnostic disable-next-line: unused-local
+    local width = vim.api.nvim_win_get_width(0)
+    local height = vim.api.nvim_win_get_height(0)
+
+    ---@diagnostic disable-next-line: unused-local
+    local win = vim.api.nvim_open_win(buf, true, {
+        relative = "win",
+        win = 0,
+        width = 30,
+        height = math.floor(height * 0.9),
+        col = 12,
+        row = math.floor(height * 0.05) - 1,
+        border = require("colortils").settings.border,
+        style = "minimal",
+    })
+    vim.api.nvim_buf_set_option(buf, "modifiable", false)
+    -- try to attach colorizer
+    pcall(vim.cmd, "ColorizerAttachToBuffer")
 end
 
 return css
