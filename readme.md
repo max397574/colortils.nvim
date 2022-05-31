@@ -58,4 +58,6 @@ require("colortils").setup({
 
 ![Screenshot 2022-05-30 at 20 03 40](https://user-images.githubusercontent.com/81827001/171042234-295e9bbf-d093-491c-98e8-c753f23f6dd1.png)
 
-#### Listed css colors
+#### List css colors
+
+![Screenshot 2022-05-31 at 18 56 23](https://user-images.githubusercontent.com/81827001/171230907-313fddc8-29e6-4b97-a842-8ea69ed5b6d5.png)
