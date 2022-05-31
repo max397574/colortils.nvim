@@ -5,6 +5,8 @@ https://user-images.githubusercontent.com/81827001/171041720-6bc1fc72-dd82-4250-
 
 ## ✨ Features
 - Color picker with nice ui
+- Some utilities for css colors
+    - List Colors
 
 ## 📦 Installation and Usage
 
@@ -29,6 +31,11 @@ This is a hex color code without the `#` at the beginning (e.g. FF00AB).
 You can use `h`/`l` to change the color value under the cursor.
 With `<cr>` you can yank the hex color code into the register specified in settings (see defaults below).
 
+#### Css Utilities
+##### List colors
+Use `:Colortils css list` to get a list of all the colors in a floating window.
+This will *try* (**it's not a dependency**) to attach [nvim-colorizer.lua](https://github.com/norcalli/nvim-colorizer.lua) ([maintained fork](https://github.com/xiyaowong/nvim-colorizer.lua)).
+
 ## ⚙️ Customization
 You can change the settings by passing options to the setup function.
 This is the default configuration:
@@ -50,3 +57,5 @@ require("colortils").setup({
 #### Color Picker with "hex"
 
 ![Screenshot 2022-05-30 at 20 03 40](https://user-images.githubusercontent.com/81827001/171042234-295e9bbf-d093-491c-98e8-c753f23f6dd1.png)
+
+#### Listed css colors
