@@ -2,8 +2,9 @@ local colortils = {}
 
 local settings = {
     register = "+",
-    ---String: "block"|"hex"
-    color_display = "block",
+    ---String: preview text. %s is color value
+    color_preview = "█ %s",
+    border = "rounded",
 }
 
 local utils = require("colortils.utils")
@@ -36,13 +37,16 @@ local function set_picker_lines()
         .. utils.get_bar(blue, 255, 15)
     table.insert(lines, blue_str)
     table.insert(lines, "")
-    if settings.color_display == "hex" then
+    if string.find(settings.color_preview, "%s") then
         table.insert(
             lines,
-            "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
+            string.format(
+                settings.color_preview,
+                "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
+            )
         )
-    elseif settings.color_display == "block" then
-        table.insert(lines, "█████")
+    else
+        table.insert(lines, settings.color_preview)
     end
     vim.api.nvim_buf_set_option(buf, "modifiable", true)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -52,7 +56,7 @@ end
 local function update_highlight()
     vim.api.nvim_set_hl(
         0,
-        "ColorPickerHighlight",
+        "ColorPickerPreview",
         { fg = "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue) }
     )
 end
@@ -71,7 +75,7 @@ local function right()
     end
     update_highlight()
     set_picker_lines()
-    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerHighlight", 4, 0, -1)
+    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
 end
 
 local function left()
@@ -88,7 +92,7 @@ local function left()
     end
     update_highlight()
     set_picker_lines()
-    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerHighlight", 4, 0, -1)
+    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
 end
 
 local function confirm()
@@ -128,24 +132,21 @@ colortils.color_picker = function()
         row = 0,
         style = "minimal",
         height = 5,
-        border = {
-            "╭",
-            "─",
-            "╮",
-            "│",
-            "╯",
-            "─",
-            "╰",
-            "│",
-        },
+        border = settings.border,
     })
     update_highlight()
     set_picker_lines()
-    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerHighlight", 4, 0, -1)
+    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
 end
 
 local commands = {
     ["picker"] = function(color)
+        if
+            not color
+            and utils.validate_color_numbers(vim.fn.expand("<cword>"))
+        then
+            color = vim.fn.expand("<cword>")
+        end
         if color and utils.validate_color_numbers(color) then
             red = tonumber(color:sub(1, 2), 16)
             green = tonumber(color:sub(3, 4), 16)
