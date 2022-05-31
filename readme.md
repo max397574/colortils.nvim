@@ -26,13 +26,17 @@ Use `Colortils picker` to access the color picker.
 You can provide an optional argument which is the intial color the picker will have.
 This is a hex color code without the `#` at the beginning (e.g. FF00AB).
 
+You can use `h`/`l` to change the color value under the cursor.
+With `<cr>` you can yank the hex color code into the register specified in settings (see defaults below).
+
 ## ⚙️ Customization
 You can change the settings by passing options to the setup function.
 This is the default configuration:
 ```lua
 require("colortils").setup({
     register="+", -- register in which color codes will be copied: any register
-    color_display = "block", -- how to display the color: "block" or "hex"
+    color_preview =  "█ %s", -- preview for colors, if it contains `%s` this will be replaced with a hex color code of the color
+    border = "rounded", -- border for the float
 })
 ```
 
