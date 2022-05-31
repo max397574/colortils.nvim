@@ -1,7 +1,7 @@
 local utils = {}
 
 ---@diagnostic disable-next-line: unused-local
-local _log = require("colortils.log")
+local log = require("colortils.log")
 
 --- Get the hex code of a number (two digits)
 ---@param number number
