@@ -128,7 +128,16 @@ colortils.color_picker = function()
         row = 0,
         style = "minimal",
         height = 5,
-        border = require("omega.utils").border(),
+        border = {
+            "╭",
+            "─",
+            "╮",
+            "│",
+            "╯",
+            "─",
+            "╰",
+            "│",
+        },
     })
     update_highlight()
     set_picker_lines()
