@@ -1,5 +1,12 @@
-# 🎨 Colortils.nvim
-### Color utils for neovim
+<div align="center">
+
+<img src="res/colortils.svg" width=300>
+
+# Neorg - An Organized Future
+
+# 🎨 Colortils.nvim - Neovim color utils
+
+</div>
 
 https://user-images.githubusercontent.com/81827001/171041720-6bc1fc72-dd82-4250-83ec-5c08c907c695.mov
 
