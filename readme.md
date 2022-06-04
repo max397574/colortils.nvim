@@ -2,8 +2,6 @@
 
 <img src="res/colortils.svg" width=300>
 
-# Neorg - An Organized Future
-
 # 🎨 Colortils.nvim - Neovim color utils
 
 </div>
