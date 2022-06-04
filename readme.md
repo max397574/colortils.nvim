@@ -6,8 +6,7 @@
 
 </div>
 
-<img src=https://user-images.githubusercontent.com/81827001/172016659-0543ca48-6080-4581-9b4f-ce35c1399138.gif width="500"/>
-
+<img src=https://user-images.githubusercontent.com/81827001/172020187-8011c927-13b4-4f75-b0c3-e76117136416.gif width="500"/>
 
 ## ✨ Features
 - Color picker with nice ui
