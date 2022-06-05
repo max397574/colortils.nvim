@@ -69,4 +69,52 @@ utils.validate_color_numbers = function(color)
     end
 end
 
+utils.validate_settings = function(settings)
+    vim.validate({
+        register = {
+            settings.register,
+            function(reg)
+                if reg:gmatch("%w") then
+                    return true
+                elseif
+                    vim.tbl_contains(
+                        { "-", "#", "=", "+", "_", " ", "/", "" },
+                        reg
+                    )
+                then
+                    return true
+                else
+                    return false
+                end
+            end,
+            "vim register",
+        },
+        color_preview = { settings.color_preview, "string" },
+        border = {
+            settings.border,
+            function(bord)
+                if
+                    vim.tbl_contains({
+                        "rounded",
+                        "single",
+                        "double",
+                        "solid",
+                        "shadow",
+                        "none",
+                    }, bord)
+                then
+                    return true
+                end
+                if
+                    type(bord) == "table"
+                    and vim.tbl_contains({ 1, 2, 4, 8 }, #bord)
+                then
+                    return true
+                end
+            end,
+            "none|single|double|rounded|solid|shadow|array",
+        },
+    })
+end
+
 return utils

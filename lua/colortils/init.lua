@@ -9,6 +9,7 @@ colortils.settings = {
 
 local utils = require("colortils.utils")
 local css = require("colortils.css")
+local log = require("colortils.log")
 
 local red = 0
 local green = 0
@@ -180,11 +181,17 @@ local function create_command()
 end
 
 colortils.setup = function(update)
-    colortils.settings = vim.tbl_deep_extend(
+    local updated_settings = vim.tbl_deep_extend(
         "force",
         colortils.settings,
         update or {}
     )
+    local ok, err = pcall(utils.validate_settings, updated_settings)
+    if not ok then
+        log.warn("Invalid config:" .. err)
+    else
+        colortils.settings = updated_settings
+    end
     create_command()
 end
 
