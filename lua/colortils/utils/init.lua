@@ -7,6 +7,11 @@ local log = require("colortils.log")
 ---@param number number
 ---@return string
 utils.hex = function(number)
+    if number > 255 then
+        number = 255
+    elseif number < 0 then
+        number = 0
+    end
     return string.format("%02X", number)
 end
 
