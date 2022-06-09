@@ -15,6 +15,14 @@ utils.hex = function(number)
     return string.format("%02X", number)
 end
 
+utils.round_float = function(number)
+    if number - math.floor(number) < 0.5 then
+        return math.floor(number)
+    else
+        return math.ceil(number)
+    end
+end
+
 --- Gets a partial block for a number between 0 and 1
 ---@param number number
 ---@return string

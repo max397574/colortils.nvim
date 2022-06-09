@@ -32,9 +32,9 @@ utils_color.gradient_colors = function(start_color, end_color, total_length)
     if not end_red then
         return
     end
-    local red_step = math.floor((end_red - start_red) / (points + 1))
-    local green_step = math.floor((end_green - start_green) / (points + 1))
-    local blue_step = math.floor((end_blue - start_blue) / (points + 1))
+    local red_step = (end_red - start_red) / (points + 1)
+    local green_step = (end_green - start_green) / (points + 1)
+    local blue_step = (end_blue - start_blue) / (points + 1)
     local gradient_colors = {
         "#" .. utils.hex(start_red) .. utils.hex(start_green) .. utils.hex(
             start_blue
@@ -42,9 +42,9 @@ utils_color.gradient_colors = function(start_color, end_color, total_length)
     }
     for i = 1, points do
         gradient_colors[#gradient_colors + 1] = "#"
-            .. utils.hex(start_red + red_step * i)
-            .. utils.hex(start_green + green_step * i)
-            .. utils.hex(start_blue + blue_step * i)
+            .. utils.hex(utils.round_float(start_red + red_step * i))
+            .. utils.hex(utils.round_float(start_green + green_step * i))
+            .. utils.hex(utils.round_float(start_blue + blue_step * i))
     end
     gradient_colors[#gradient_colors + 1] = "#"
         .. utils.hex(end_red)
@@ -67,12 +67,8 @@ utils_color.display_gradient =
             line,
             line,
             false,
-            -- { string.rep("█", width) }
             { string.rep("▌", width / 2) }
         )
-        vim.pretty_print(gradient)
-        -- for i, color in ipairs(gradient) do
-        -- for i, color in ipairs(gradient) do
         for i = 1, width do
             vim.api.nvim_set_hl(
                 0,
