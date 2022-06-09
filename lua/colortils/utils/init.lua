@@ -69,6 +69,9 @@ utils.validate_color_numbers = function(color)
     end
 end
 
+-- TODO: make this custom for better errors
+--- Validates settings
+---@param settings table
 utils.validate_settings = function(settings)
     vim.validate({
         register = {
