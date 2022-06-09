@@ -19,8 +19,8 @@ end
 
 utils_color.gradient_colors = function(start_color, end_color, total_length)
     local points = total_length - 2
-    if points <= 0 then
-        return { start_color, end_color }
+    if points < 0 then
+        points = 0
     end
     local start_red, start_green, start_blue = utils_color.get_values(
         start_color
