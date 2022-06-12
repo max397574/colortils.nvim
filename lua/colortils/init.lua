@@ -63,6 +63,12 @@ local function update_highlight()
     )
 end
 
+--- Check if the sum of (number & increment) > 255
+--- -> If so, return 255
+--- --> Otherwise, return the sum of number & increment
+---@param number number
+---@param increment number
+---@return number
 local function right_check(number, increment)
     if number + increment > 255 then
         return 255
@@ -70,6 +76,7 @@ local function right_check(number, increment)
         return number + increment
     end
 end
+
 local function right(increment)
     increment = increment or 1
     local row = vim.api.nvim_win_get_cursor(win)[1]
@@ -88,6 +95,12 @@ local function right(increment)
     vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
 end
 
+--- Check if (number - increment) < 255
+--- -> If so, return 0
+--- --> Otherwise, return the result of number - increment
+---@param number number
+---@param increment number
+---@return number
 local function left_check(number, increment)
     if number - increment < 0 then
         return 0
@@ -95,6 +108,7 @@ local function left_check(number, increment)
         return number - increment
     end
 end
+
 local function left(increment)
     increment = increment or 1
     local row = vim.api.nvim_win_get_cursor(win)[1]
