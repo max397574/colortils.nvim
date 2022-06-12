@@ -63,34 +63,50 @@ local function update_highlight()
     )
 end
 
-local function right()
+local function right_check(number, increment)
+    if number + increment > 255 then
+        return 255
+    else
+        return number + increment
+    end
+end
+local function right(increment)
+    increment = increment or 1
     local row = vim.api.nvim_win_get_cursor(win)[1]
     if not vim.tbl_contains({ 1, 2, 3 }, row) then
         return
     end
     if row == 1 and red < 255 then
-        red = red + 1
+        red = right_check(red, increment)
     elseif row == 2 and green < 255 then
-        green = green + 1
+        green = right_check(green, increment)
     elseif row == 3 and blue < 255 then
-        blue = blue + 1
+        blue = right_check(blue, increment)
     end
     update_highlight()
     set_picker_lines()
     vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
 end
 
-local function left()
+local function left_check(number, increment)
+    if number - increment < 0 then
+        return 0
+    else
+        return number - increment
+    end
+end
+local function left(increment)
+    increment = increment or 1
     local row = vim.api.nvim_win_get_cursor(win)[1]
     if not vim.tbl_contains({ 1, 2, 3 }, row) then
         return
     end
     if row == 1 and red > 0 then
-        red = red - 1
+        red = left_check(red, increment)
     elseif row == 2 and green > 0 then
-        green = green - 1
+        green = left_check(green, increment)
     elseif row == 3 and blue > 0 then
-        blue = blue - 1
+        blue = left_check(blue, increment)
     end
     update_highlight()
     set_picker_lines()
@@ -115,6 +131,18 @@ local function create_mappings()
     end, { buffer = buf })
     vim.keymap.set("n", "h", function()
         left()
+    end, { buffer = buf })
+    vim.keymap.set("n", "L", function()
+        right(5)
+    end, { buffer = buf })
+    vim.keymap.set("n", "H", function()
+        left(5)
+    end, { buffer = buf })
+    vim.keymap.set("n", "K", function()
+        right(10)
+    end, { buffer = buf })
+    vim.keymap.set("n", "J", function()
+        left(10)
     end, { buffer = buf })
     vim.keymap.set("n", "<cr>", function()
         confirm()
