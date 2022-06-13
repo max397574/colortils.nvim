@@ -5,6 +5,10 @@ colortils.settings = {
     ---String: preview text. %s is color value
     color_preview = "█ %s",
     border = "rounded",
+    mappings = {
+        increment_big = "w",
+        decrement_big = "b",
+    },
     window = {
         relative = "cursor",
         width = 30,
@@ -70,52 +74,18 @@ local function update_highlight()
     )
 end
 
-local function increment(amount)
+local function adjust_color(amount)
     local row = vim.api.nvim_win_get_cursor(win)[1]
     if not vim.tbl_contains({ 1, 2, 3 }, row) then
         return
     end
-    if row == 1 and red < 255 then
-        red = red + amount
-        if red > 255 then
-            red = 255
-        end
-    elseif row == 2 and green < 255 then
-        green = green + amount
-        if green > 255 then
-            green = 255
-        end
-    elseif row == 3 and blue < 255 then
-        blue = blue + amount
-        if blue > 255 then
-            blue = 255
-        end
-    end
-    update_highlight()
-    set_picker_lines()
-    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
-end
-
-local function decrement(amount)
-    local row = vim.api.nvim_win_get_cursor(win)[1]
-    if not vim.tbl_contains({ 1, 2, 3 }, row) then
-        return
-    end
-    if row == 1 and red > 0 then
-        red = red - amount
-        if red < 0 then
-            red = 0
-        end
-    elseif row == 2 and green > 0 then
-        green = green - amount
-        if green < 0 then
-            green = 0
-        end
-    elseif row == 3 and blue > 0 then
-        blue = blue - amount
-        if blue < 0 then
-            blue = 0
-        end
+    print(red, green, blue)
+    if row == 1 then
+        red = utils.adjust_value(red, amount)
+    elseif row == 2 then
+        green = utils.adjust_value(green, amount)
+    elseif row == 3 then
+        blue = utils.adjust_value(blue, amount)
     end
     update_highlight()
     set_picker_lines()
@@ -136,12 +106,22 @@ end
 local function create_mappings()
     vim.keymap.set("n", "q", "<cmd>q<cr>", { buffer = buf })
     vim.keymap.set("n", "l", function()
-        increment(1)
+        adjust_color(1)
     end, {
         buffer = buf,
     })
     vim.keymap.set("n", "h", function()
-        decrement(1)
+        adjust_color(-1)
+    end, {
+        buffer = buf,
+    })
+    vim.keymap.set("n", colortils.settings.mappings.increment_big, function()
+        adjust_color(5)
+    end, {
+        buffer = buf,
+    })
+    vim.keymap.set("n", colortils.settings.mappings.decrement_big, function()
+        adjust_color(-5)
     end, {
         buffer = buf,
     })

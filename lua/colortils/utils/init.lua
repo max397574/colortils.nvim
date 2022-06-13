@@ -27,6 +27,17 @@ utils.create_mappings = function(buf)
     vim.keymap.set("n", "q", "<cmd>q<cr>", { buffer = buf })
 end
 
+utils.adjust_value = function(value, amount)
+    value = value + amount
+    if value > 255 then
+        value = 255
+    end
+    if value < 0 then
+        value = 0
+    end
+    return value
+end
+
 --- Gets a partial block for a number between 0 and 1
 ---@param number number
 ---@return string
