@@ -3,18 +3,10 @@ local utils_color = {}
 local utils = require("colortils.utils")
 
 utils_color.get_values = function(color)
-    local red, green, blue
-    if color and utils.validate_color_numbers(color) then
-        red = tonumber(color:sub(1, 2), 16)
-        green = tonumber(color:sub(3, 4), 16)
-        blue = tonumber(color:sub(5, 6), 16)
-        return red, green, blue
-    elseif color and utils.validate_color_complete(color) then
-        red = tonumber(color:sub(2, 3), 16)
-        green = tonumber(color:sub(4, 5), 16)
-        blue = tonumber(color:sub(6, 7), 16)
-        return red, green, blue
-    end
+    local red = tonumber(color:sub(2, 3), 16)
+    local green = tonumber(color:sub(4, 5), 16)
+    local blue = tonumber(color:sub(6, 7), 16)
+    return red, green, blue
 end
 
 utils_color.gradient_colors = function(start_color, end_color, total_length)
@@ -87,5 +79,12 @@ utils_color.display_gradient =
             )
         end
     end
+
+utils_color.get_grey = function(color)
+    local red, green, blue = utils_color.get_values(color)
+    local amount = red * 0.2126 + green * 0.7152 + blue * 0.0722
+    local single_hex = utils.hex(utils.round_float(amount))
+    return "#" .. string.rep(single_hex, 3)
+end
 
 return utils_color

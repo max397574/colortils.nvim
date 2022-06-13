@@ -5,6 +5,13 @@ colortils.settings = {
     ---String: preview text. %s is color value
     color_preview = "█ %s",
     border = "rounded",
+    window = {
+        relative = "cursor",
+        width = 30,
+        col = 0,
+        row = 0,
+        height = 5,
+    },
 }
 
 local utils = require("colortils.utils")
@@ -63,34 +70,52 @@ local function update_highlight()
     )
 end
 
-local function right()
+local function increment(amount)
     local row = vim.api.nvim_win_get_cursor(win)[1]
     if not vim.tbl_contains({ 1, 2, 3 }, row) then
         return
     end
     if row == 1 and red < 255 then
-        red = red + 1
+        red = red + amount
+        if red > 255 then
+            red = 255
+        end
     elseif row == 2 and green < 255 then
-        green = green + 1
+        green = green + amount
+        if green > 255 then
+            green = 255
+        end
     elseif row == 3 and blue < 255 then
-        blue = blue + 1
+        blue = blue + amount
+        if blue > 255 then
+            blue = 255
+        end
     end
     update_highlight()
     set_picker_lines()
     vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
 end
 
-local function left()
+local function decrement(amount)
     local row = vim.api.nvim_win_get_cursor(win)[1]
     if not vim.tbl_contains({ 1, 2, 3 }, row) then
         return
     end
     if row == 1 and red > 0 then
-        red = red - 1
+        red = red - amount
+        if red < 0 then
+            red = 0
+        end
     elseif row == 2 and green > 0 then
-        green = green - 1
+        green = green - amount
+        if green < 0 then
+            green = 0
+        end
     elseif row == 3 and blue > 0 then
-        blue = blue - 1
+        blue = blue - amount
+        if blue < 0 then
+            blue = 0
+        end
     end
     update_highlight()
     set_picker_lines()
@@ -111,11 +136,15 @@ end
 local function create_mappings()
     vim.keymap.set("n", "q", "<cmd>q<cr>", { buffer = buf })
     vim.keymap.set("n", "l", function()
-        right()
-    end, { buffer = buf })
+        increment(1)
+    end, {
+        buffer = buf,
+    })
     vim.keymap.set("n", "h", function()
-        left()
-    end, { buffer = buf })
+        decrement(1)
+    end, {
+        buffer = buf,
+    })
     vim.keymap.set("n", "<cr>", function()
         confirm()
     end, {

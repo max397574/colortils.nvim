@@ -23,6 +23,10 @@ utils.round_float = function(number)
     end
 end
 
+utils.create_mappings = function(buf)
+    vim.keymap.set("n", "q", "<cmd>q<cr>", { buffer = buf })
+end
+
 --- Gets a partial block for a number between 0 and 1
 ---@param number number
 ---@return string
