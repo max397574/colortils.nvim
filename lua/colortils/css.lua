@@ -1,6 +1,5 @@
 local css = {}
 
--- TODO: Try to make this a table without keys so it always has the same order
 local colors = {
     { "aliceblue", "#F0F8FF" },
     { "antiquewhite", "#FAEBD7" },
@@ -147,6 +146,9 @@ local colors = {
 
 css.colors = colors
 
+--- Get the value for a color
+---@param color string Color name
+---@return string
 css.get_color_value = function(color)
     for _, color_table in ipairs(colors) do
         if color_table[1] == color then
@@ -156,6 +158,9 @@ css.get_color_value = function(color)
     return nil
 end
 
+--- Gets the table for a color
+---@param color string Color name
+---@return table [name,value]
 css.get_color_table = function(color)
     for _, color_table in ipairs(colors) do
         if color_table[1] == color then
@@ -165,6 +170,8 @@ css.get_color_table = function(color)
     return nil
 end
 
+--- Gets the colors formatted as a table of string
+---@return table "color strings"
 css.get_formated_colors = function()
     local lines = {}
     for _, color in ipairs(colors) do
@@ -180,6 +187,7 @@ css.get_formated_colors = function()
     return lines
 end
 
+--- Lists colors in a floating window
 css.list_colors = function()
     local buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, css.get_formated_colors())

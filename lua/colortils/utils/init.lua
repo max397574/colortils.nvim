@@ -15,6 +15,9 @@ utils.hex = function(number)
     return string.format("%02X", number)
 end
 
+--- Rounds a float
+---@param number float
+---@return number rounded
 utils.round_float = function(number)
     if number - math.floor(number) < 0.5 then
         return math.floor(number)
@@ -23,10 +26,16 @@ utils.round_float = function(number)
     end
 end
 
+--- Creates common mappings for a buffer
+---@param buf number
 utils.create_mappings = function(buf)
     vim.keymap.set("n", "q", "<cmd>q<cr>", { buffer = buf })
 end
 
+--- Adjust a color value (with maximum and minimum)
+---@param value number
+---@param amount number
+---@return number adjusted
 utils.adjust_value = function(value, amount)
     value = value + amount
     if value > 255 then

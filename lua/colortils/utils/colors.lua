@@ -2,6 +2,9 @@ local utils_color = {}
 
 local utils = require("colortils.utils")
 
+--- Gets the values of a hex color
+---@param color string "#xxxxxx"
+---@return number, number, number "red,green,blue"
 utils_color.get_values = function(color)
     local red = tonumber(color:sub(2, 3), 16)
     local green = tonumber(color:sub(4, 5), 16)
@@ -9,6 +12,11 @@ utils_color.get_values = function(color)
     return red, green, blue
 end
 
+--- Get colors for a gradient
+---@param start_color string "#xxxxxx"
+---@param end_color string "#xxxxxx"
+---@param total_length number
+---@return table colors
 utils_color.gradient_colors = function(start_color, end_color, total_length)
     local points = total_length - 2
     if points < 0 then
@@ -47,6 +55,13 @@ utils_color.gradient_colors = function(start_color, end_color, total_length)
 end
 
 utils_color.display_gradient =
+    --- Displays gradient at a certain position
+    ---@param buf number
+    ---@param ns number
+    ---@param line number
+    ---@param start_color string "#xxxxxx"
+    ---@param end_color string "#xxxxxx"
+    ---@param width number
     function(buf, ns, line, start_color, end_color, width)
         width = width * 2
         local gradient = utils_color.gradient_colors(
@@ -80,6 +95,9 @@ utils_color.display_gradient =
         end
     end
 
+--- Gets the gray color for a certain color
+---@param color string "#xxxxxx"
+---@return string color
 utils_color.get_grey = function(color)
     local red, green, blue = utils_color.get_values(color)
     local amount = red * 0.2126 + green * 0.7152 + blue * 0.0722
