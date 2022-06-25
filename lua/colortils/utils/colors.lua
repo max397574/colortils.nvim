@@ -105,4 +105,15 @@ utils_color.get_grey = function(color)
     return "#" .. string.rep(single_hex, 3)
 end
 
+--- Gets complementary color
+---@param color string "#xxxxxx"
+---@return string color
+function utils_color.complementary(color)
+    local red, green, blue = utils_color.get_values(color)
+    red = utils.hex(255 - red)
+    green = utils.hex(255 - green)
+    blue = utils.hex(255 - blue)
+    return "#" .. red .. green .. blue
+end
+
 return utils_color
