@@ -6,7 +6,7 @@ local log = require("colortils.log")
 --- Get the hex code of a number (two digits)
 ---@param number number
 ---@return string
-utils.hex = function(number)
+function utils.hex(number)
     if number > 255 then
         number = 255
     elseif number < 0 then
@@ -18,7 +18,7 @@ end
 --- Rounds a float
 ---@param number float
 ---@return number rounded
-utils.round_float = function(number)
+function utils.round_float(number)
     if number - math.floor(number) < 0.5 then
         return math.floor(number)
     else
@@ -28,7 +28,7 @@ end
 
 --- Creates common mappings for a buffer
 ---@param buf number
-utils.create_mappings = function(buf)
+function utils.create_mappings(buf)
     vim.keymap.set("n", "q", "<cmd>q<cr>", { buffer = buf })
 end
 
@@ -36,7 +36,7 @@ end
 ---@param value number
 ---@param amount number
 ---@return number adjusted
-utils.adjust_value = function(value, amount)
+function utils.adjust_value(value, amount)
     value = value + amount
     if value > 255 then
         value = 255
@@ -50,7 +50,7 @@ end
 --- Gets a partial block for a number between 0 and 1
 ---@param number number
 ---@return string
-utils.get_partial_block = function(number)
+function utils.get_partial_block(number)
     if number >= 0.875 then
         return "▉"
     elseif number >= 0.75 then
@@ -75,7 +75,7 @@ end
 ---@param max_value number Maximum possible value
 ---@param max_width number Maximum possible width of the bar (value==max_value)
 ---@return string Bar
-utils.get_bar = function(value, max_value, max_width)
+function utils.get_bar(value, max_value, max_width)
     -- get value of one block
     local block_value = max_value / max_width
     -- get amount of full blocks
@@ -88,7 +88,7 @@ end
 
 --- Checks if is valid color
 ---@param color string Hex color code
-utils.validate_color_complete = function(color)
+function utils.validate_color_complete(color)
     if color:match("^#%x%x%x%x%x%x$") then
         return true
     else
@@ -98,7 +98,7 @@ end
 
 --- Checks if is valid color
 ---@param color string Hex color code without #
-utils.validate_color_numbers = function(color)
+function utils.validate_color_numbers(color)
     if color:match("^%x%x%x%x%x%x$") then
         return true
     else
@@ -109,7 +109,7 @@ end
 -- TODO: make this custom for better errors
 --- Validates settings
 ---@param settings table
-utils.validate_settings = function(settings)
+function utils.validate_settings(settings)
     vim.validate({
         register = {
             settings.register,

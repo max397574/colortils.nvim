@@ -87,7 +87,7 @@ local function create_command()
     })
 end
 
-colortils.setup = function(update)
+function colortils.setup(update)
     local updated_settings = vim.tbl_deep_extend(
         "force",
         colortils.settings,

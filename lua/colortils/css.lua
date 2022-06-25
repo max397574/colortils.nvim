@@ -149,7 +149,7 @@ css.colors = colors
 --- Get the value for a color
 ---@param color string Color name
 ---@return string
-css.get_color_value = function(color)
+function css.get_color_value(color)
     for _, color_table in ipairs(colors) do
         if color_table[1] == color then
             return color_table[2]
@@ -161,7 +161,7 @@ end
 --- Gets the table for a color
 ---@param color string Color name
 ---@return table [name,value]
-css.get_color_table = function(color)
+function css.get_color_table(color)
     for _, color_table in ipairs(colors) do
         if color_table[1] == color then
             return color_table
@@ -172,7 +172,7 @@ end
 
 --- Gets the colors formatted as a table of string
 ---@return table "color strings"
-css.get_formated_colors = function()
+function css.get_formated_colors()
     local lines = {}
     for _, color in ipairs(colors) do
         table.insert(
@@ -188,7 +188,7 @@ css.get_formated_colors = function()
 end
 
 --- Lists colors in a floating window
-css.list_colors = function()
+function css.list_colors()
     local buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, css.get_formated_colors())
     vim.keymap.set("n", "q", "<cmd>q<CR>", { noremap = true, buffer = buf })

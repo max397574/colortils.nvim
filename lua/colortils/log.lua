@@ -45,7 +45,7 @@ local log = {}
 
 local unpack = unpack or table.unpack
 
-log.new = function(config, standalone)
+function log.new(config, standalone)
     config = vim.tbl_deep_extend("force", default_config, config)
 
     local outfile = string.format(
@@ -66,13 +66,13 @@ log.new = function(config, standalone)
         levels[v.name] = i
     end
 
-    local round = function(x, increment)
+    local function round(x, increment)
         increment = increment or 1
         x = x / increment
         return (x > 0 and math.floor(x + 0.5) or math.ceil(x - 0.5)) * increment
     end
 
-    local make_string = function(...)
+    local function make_string(...)
         local t = {}
         for i = 1, select("#", ...) do
             local x = select(i, ...)
@@ -90,7 +90,7 @@ log.new = function(config, standalone)
         return table.concat(t, " ")
     end
 
-    local log_at_level = function(level, level_config, message_maker, ...)
+    local function log_at_level(level, level_config, message_maker, ...)
         -- Return early if we're below the config.level
         if level < levels[config.level] then
             return
@@ -103,7 +103,7 @@ log.new = function(config, standalone)
 
         -- Output to console
         if config.use_console then
-            local log_to_console = function()
+            local function log_to_console()
                 local console_string = string.format(
                     "[%-6s%s] %s: %s",
                     nameupper,

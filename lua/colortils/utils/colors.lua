@@ -5,7 +5,7 @@ local utils = require("colortils.utils")
 --- Gets the values of a hex color
 ---@param color string "#xxxxxx"
 ---@return number, number, number "red,green,blue"
-utils_color.get_values = function(color)
+function utils_color.get_values(color)
     local red = tonumber(color:sub(2, 3), 16)
     local green = tonumber(color:sub(4, 5), 16)
     local blue = tonumber(color:sub(6, 7), 16)
@@ -17,7 +17,7 @@ end
 ---@param end_color string "#xxxxxx"
 ---@param total_length number
 ---@return table colors
-utils_color.gradient_colors = function(start_color, end_color, total_length)
+function utils_color.gradient_colors(start_color, end_color, total_length)
     local points = total_length - 2
     if points < 0 then
         points = 0
@@ -98,7 +98,7 @@ utils_color.display_gradient =
 --- Gets the gray color for a certain color
 ---@param color string "#xxxxxx"
 ---@return string color
-utils_color.get_grey = function(color)
+function utils_color.get_grey(color)
     local red, green, blue = utils_color.get_values(color)
     local amount = red * 0.2126 + green * 0.7152 + blue * 0.0722
     local single_hex = utils.hex(utils.round_float(amount))
