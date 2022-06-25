@@ -75,7 +75,7 @@ return function(color)
         buffer = buf,
         noremap = true,
     })
-    vim.keymap.set("n", "L", function()
+    vim.keymap.set("n", settings.mappings.increment_big, function()
         increase(5)
     end, {
         buffer = buf,
@@ -92,7 +92,7 @@ return function(color)
         buffer = buf,
         noremap = true,
     })
-    vim.keymap.set("n", "H", function()
+    vim.keymap.set("n", settings.mappings.decrement_big, function()
         decrease(5)
     end, {
         buffer = buf,
