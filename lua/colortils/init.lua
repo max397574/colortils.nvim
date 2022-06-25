@@ -22,32 +22,52 @@ local utils = require("colortils.utils")
 local css = require("colortils.css")
 local log = require("colortils.log")
 
+local function get_color(color, invalid)
+    color = color or ""
+    if color:match("^#%x%x%x%x%x%x$") then
+        return color
+    elseif color:match("^%x%x%x%x%x%x$") then
+        return "#" .. color
+    elseif not color and vim.fn.expand("<cword>"):match("^%x%x%x%x%x%x$") then
+        return "#" .. vim.fn.expand("<cword>")
+    end
+    if invalid then
+        color = vim.fn.input("Input a valid color > ", "#RRGGBB")
+    else
+        color = vim.fn.input("Input a color > ", "#RRGGBB")
+    end
+    if not color:match("^#%x%x%x%x%x%x$") then
+        color = get_color(nil, true)
+    end
+    return color
+end
+
 local commands = {
     ["picker"] = function(args)
-        local red, green, blue
-        local color = args.fargs[2] or nil
-        if
-            not color
-            and utils.validate_color_numbers(vim.fn.expand("<cword>"))
-        then
-            color = vim.fn.expand("<cword>")
-        end
-        if color and utils.validate_color_numbers(color) then
-            red = tonumber(color:sub(1, 2), 16)
-            green = tonumber(color:sub(3, 4), 16)
-            blue = tonumber(color:sub(5, 6), 16)
-        end
-        require("colortils.tools.picker")(
-            "#"
-                .. (red and utils.hex(red) or "00")
-                .. (green and utils.hex(green) or "00")
-                .. (blue and utils.hex(blue) or "00")
-        )
+        local color = get_color(args.fargs[2])
+        require("colortils.tools.picker")(color)
     end,
     ["css"] = function(args)
         if args.fargs[2] == "list" then
             css.list_colors()
         end
+    end,
+    ["gradient"] = function(args)
+        local color_1 = get_color(args.fargs[2])
+        local color_2 = get_color(args.fargs[3])
+        require("colortils.tools.gradients.colors")(color_1, color_2)
+    end,
+    ["greyscale"] = function(args)
+        local color = get_color(args.fargs[2])
+        require("colortils.tools.gradients.greyscale")(color)
+    end,
+    ["lighten"] = function(args)
+        local color = get_color(args.fargs[2])
+        require("colortils.tools.lighten")(color)
+    end,
+    ["darken"] = function(args)
+        local color = get_color(args.fargs[2])
+        require("colortils.tools.darken")(color)
     end,
 }
 

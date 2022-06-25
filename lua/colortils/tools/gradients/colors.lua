@@ -5,18 +5,6 @@ local idx = 1
 local buf
 local ns = vim.api.nvim_create_namespace("colortils_gradient")
 local old_cursor = vim.opt.guicursor
-local function get_color(invalid_color)
-    local color
-    if invalid_color then
-        color = vim.fn.input("Input a valid color (#RRGGBB) > ", "")
-    else
-        color = vim.fn.input("Input a second color > ", "")
-    end
-    if not color:match("^#%x%x%x%x%x%x$") then
-        color = get_color(true)
-    end
-    return color
-end
 
 local function set_marker()
     vim.api.nvim_buf_set_lines(
@@ -52,9 +40,6 @@ local function decrease(amount)
 end
 
 return function(color, color_2)
-    if not color_2 then
-        color_2 = get_color()
-    end
     buf = vim.api.nvim_create_buf(false, true)
     local win = vim.api.nvim_open_win(buf, true, {
         relative = "editor",
