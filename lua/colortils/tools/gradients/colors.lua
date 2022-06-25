@@ -2,6 +2,7 @@ local color_utils = require("colortils.utils.colors")
 local utils = require("colortils.utils")
 local settings = require("colortils").settings
 local idx = 1
+local buf
 local ns = vim.api.nvim_create_namespace("colortils_gradient")
 local old_cursor = vim.opt.guicursor
 local function get_color(invalid_color)
@@ -17,11 +18,44 @@ local function get_color(invalid_color)
     return color
 end
 
+local function set_marker()
+    vim.api.nvim_buf_set_lines(
+        buf,
+        1,
+        2,
+        false,
+        { string.rep(" ", math.floor(idx / 5) - 1) .. "^" }
+    )
+end
+
+local function increase(amount)
+    amount = amount or 1
+    if idx >= 51 * 5 then
+        return
+    end
+    idx = idx + amount
+    if idx > 255 then
+        idx = 255
+    end
+    set_marker()
+end
+local function decrease(amount)
+    amount = amount or 1
+    if idx <= 1 then
+        return
+    end
+    idx = idx - amount
+    if idx < 1 then
+        idx = 1
+    end
+    set_marker()
+end
+
 return function(color, color_2)
     if not color_2 then
         color_2 = get_color()
     end
-    local buf = vim.api.nvim_create_buf(false, true)
+    buf = vim.api.nvim_create_buf(false, true)
     local win = vim.api.nvim_open_win(buf, true, {
         relative = "editor",
         width = 51,
@@ -44,40 +78,7 @@ return function(color, color_2)
         color_2,
         255
     )
-
-    local function set_marker()
-        vim.api.nvim_buf_set_lines(
-            buf,
-            1,
-            2,
-            false,
-            { string.rep(" ", math.floor(idx / 5) - 1) .. "^" }
-        )
-    end
-    local function increase(amount)
-        amount = amount or 1
-        if idx >= 51 * 5 then
-            return
-        end
-        idx = idx + amount
-        if idx > 255 then
-            idx = 255
-        end
-        set_marker()
-        vim.api.nvim_buf_set_lines(buf, 2, 3, false, { gradient_big[idx] })
-        vim.api.nvim_set_hl(0, "ColorPickerPreview", { fg = gradient_big[idx] })
-        vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 2, 0, -1)
-    end
-    local function decrease(amount)
-        amount = amount or 1
-        if idx <= 1 then
-            return
-        end
-        idx = idx - amount
-        if idx < 1 then
-            idx = 1
-        end
-        set_marker()
+    local function update()
         vim.api.nvim_set_hl(0, "ColorPickerPreview", { fg = gradient_big[idx] })
         vim.api.nvim_buf_set_lines(buf, 2, 3, false, { gradient_big[idx] })
         vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 2, 0, -1)
@@ -85,12 +86,14 @@ return function(color, color_2)
 
     vim.keymap.set("n", "l", function()
         increase()
+        update()
     end, {
         buffer = buf,
         noremap = true,
     })
     vim.keymap.set("n", settings.mappings.increment_big, function()
         increase(5)
+        update()
     end, {
         buffer = buf,
         noremap = true,
@@ -102,6 +105,7 @@ return function(color, color_2)
 
     vim.keymap.set("n", "h", function()
         decrease()
+        update()
     end, {
         buffer = buf,
         noremap = true,
@@ -111,6 +115,7 @@ return function(color, color_2)
         vim.api.nvim_buf_delete(buf, {})
         buf = nil
         win = nil
+        idx=0
         vim.fn.setreg(settings.register, gradient_big[idx])
     end, {
         buffer = buf,
@@ -118,6 +123,7 @@ return function(color, color_2)
     })
     vim.keymap.set("n", settings.mappings.decrement_big, function()
         decrease(5)
+        update()
     end, {
         buffer = buf,
         noremap = true,
