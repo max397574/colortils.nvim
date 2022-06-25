@@ -6,8 +6,8 @@ colortils.settings = {
     color_preview = "█ %s",
     border = "rounded",
     mappings = {
-        increment_big = "w",
-        decrement_big = "b",
+        increment_big = "L",
+        decrement_big = "H",
     },
     window = {
         relative = "cursor",
