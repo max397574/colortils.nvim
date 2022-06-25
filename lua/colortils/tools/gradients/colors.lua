@@ -22,7 +22,7 @@ return function(color, color_2)
         color_2 = get_color()
     end
     local buf = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_open_win(buf, true, {
+    local win = vim.api.nvim_open_win(buf, true, {
         relative = "editor",
         width = 51,
         col = 10,
@@ -102,6 +102,16 @@ return function(color, color_2)
 
     vim.keymap.set("n", "h", function()
         decrease()
+    end, {
+        buffer = buf,
+        noremap = true,
+    })
+    vim.keymap.set("n", "<cr>", function()
+        vim.api.nvim_win_close(win, true)
+        vim.api.nvim_buf_delete(buf, {})
+        buf = nil
+        win = nil
+        vim.fn.setreg(settings.register, gradient_big[idx])
     end, {
         buffer = buf,
         noremap = true,

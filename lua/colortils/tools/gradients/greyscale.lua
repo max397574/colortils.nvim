@@ -8,7 +8,7 @@ local old_cursor = vim.opt.guicursor
 return function(color)
     local grey = color_utils.get_grey(color)
     local buf = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_open_win(buf, true, {
+    local win = vim.api.nvim_open_win(buf, true, {
         relative = "editor",
         width = 51,
         col = 10,
@@ -94,6 +94,16 @@ return function(color)
     })
     vim.keymap.set("n", settings.mappings.decrement_big, function()
         decrease(5)
+    end, {
+        buffer = buf,
+        noremap = true,
+    })
+    vim.keymap.set("n", "<cr>", function()
+        vim.api.nvim_win_close(win, true)
+        vim.api.nvim_buf_delete(buf, {})
+        buf = nil
+        win = nil
+        vim.fn.setreg(settings.register, gradient_big[idx])
     end, {
         buffer = buf,
         noremap = true,
