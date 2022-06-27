@@ -66,3 +66,6 @@ require("colortils").setup({
 #### List css colors
 
 ![Screenshot 2022-05-31 at 18 56 23](https://user-images.githubusercontent.com/81827001/171230907-313fddc8-29e6-4b97-a842-8ea69ed5b6d5.png)
+
+# Similar Plugins
+This plugin has some things which are similar to [vim-colortemplate](https://github.com/lifepillar/vim-colortemplate).
