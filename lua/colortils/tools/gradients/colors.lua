@@ -47,7 +47,7 @@ return function(color, color_2)
         col = 10,
         row = 5,
         style = "minimal",
-        height = 5,
+        height = 3,
         border = settings.border,
     })
     color_utils.display_gradient(buf, ns, 0, color, color_2, 51)
@@ -65,7 +65,14 @@ return function(color, color_2)
     )
     local function update()
         vim.api.nvim_set_hl(0, "ColorPickerPreview", { fg = gradient_big[idx] })
-        vim.api.nvim_buf_set_lines(buf, 2, 3, false, { gradient_big[idx] })
+        local line
+        if string.find(settings.color_preview, "%s") then
+            line = string.format(settings.color_preview, gradient_big[idx])
+        else
+            line = settings.color_preview
+        end
+
+        vim.api.nvim_buf_set_lines(buf, 2, 3, false, { line })
         vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 2, 0, -1)
     end
 
@@ -100,8 +107,8 @@ return function(color, color_2)
         vim.api.nvim_buf_delete(buf, {})
         buf = nil
         win = nil
-        idx = 0
         vim.fn.setreg(settings.register, gradient_big[idx])
+        idx = 0
     end, {
         buffer = buf,
         noremap = true,
@@ -114,7 +121,5 @@ return function(color, color_2)
         noremap = true,
     })
     set_marker()
-    vim.api.nvim_buf_set_lines(buf, 2, 3, false, { gradient_big[idx] })
-    vim.api.nvim_set_hl(0, "ColorPickerPreview", { fg = gradient_big[idx] })
-    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 2, 0, -1)
+    update()
 end
