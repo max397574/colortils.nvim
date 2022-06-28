@@ -100,8 +100,8 @@ return function(color)
         vim.api.nvim_buf_delete(buf, {})
         buf = nil
         win = nil
-        idx = 0
         vim.fn.setreg(settings.register, gradient_big[idx])
+        idx = 0
     end, {
         buffer = buf,
         noremap = true,
