@@ -69,22 +69,32 @@ If there is no color under the cursor the user gets asked for input.
 #### Color Picker
 `Colortils picker <color>`
 
+![picker](https://user-images.githubusercontent.com/81827001/176244717-c4a3d4c5-bb95-4abc-93e0-3733bf87ddb0.png)
+
 #### Lighten color
 `Colortils lighten <color>`
+
+![lighten](https://user-images.githubusercontent.com/81827001/176244769-0967873c-8782-4bfb-ba7e-79b2d2a60a54.png)
 
 #### Darken color
 `Colortils darken <color>`
 
+![darken](https://user-images.githubusercontent.com/81827001/176244817-fa21c4c9-9700-4889-a379-5bbddb576234.png)
+
 #### Color to greyscale
 `Colortils greyscale <color>`
+
+![greyscale](https://user-images.githubusercontent.com/81827001/176244870-697a7d17-3b06-4bd1-ba07-9a59177096c4.png)
 
 #### Pick color on gradient
 `Colortils gradient <color1> <color2>`
 
+![gradients](https://user-images.githubusercontent.com/81827001/176244977-3831bc86-f3e7-44fc-b4d9-d615d1ae9d16.png)
+
 #### List css colors
 `Colortils css list`
 
-![Screenshot 2022-05-31 at 18 56 23](https://user-images.githubusercontent.com/81827001/171230907-313fddc8-29e6-4b97-a842-8ea69ed5b6d5.png)
+![css_list](https://user-images.githubusercontent.com/81827001/171230907-313fddc8-29e6-4b97-a842-8ea69ed5b6d5.png)
 
 # Similar Plugins
 This plugin has some things which are similar to [vim-colortemplate](https://github.com/lifepillar/vim-colortemplate).
