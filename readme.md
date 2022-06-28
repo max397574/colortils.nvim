@@ -9,7 +9,10 @@
 <img src=https://user-images.githubusercontent.com/81827001/172020187-8011c927-13b4-4f75-b0c3-e76117136416.gif width="500"/>
 
 ## ✨ Features
-- Color picker with nice ui
+- Rgb color picker
+- Lighten and darken colors
+- Convert colors to greyscale or something between the color and it's grey version
+- Pick a color on a gradient between two colors
 - Some utilities for css colors
     - List Colors
 
@@ -52,18 +55,34 @@ require("colortils").setup({
 })
 ```
 
-## 👀 Demo
+## Usage
+You can use the different tools with commands.
+Those take the format `Colortils <tool> <color>`.
+The color can either just be a 6 digit hex code (e.g. `FFAB00`) or one with a `#`.
+Notice that the `#` needs to be escaped like this `#FF00AB`.
 
-#### Color Picker with "block"
+If no color is provided colortils checks if there is a color under the cursor and if so uses this one.
+If there is no color under the cursor the user gets asked for input.
 
-![Screenshot 2022-05-30 at 20 02 39](https://user-images.githubusercontent.com/81827001/171042127-6b7fe7f3-a95e-4ce7-b1ea-8026d3c03805.png)
+## 👀 Tools
 
+#### Color Picker
+`Colortils picker <color>`
 
-#### Color Picker with "hex"
+#### Lighten color
+`Colortils lighten <color>`
 
-![Screenshot 2022-05-30 at 20 03 40](https://user-images.githubusercontent.com/81827001/171042234-295e9bbf-d093-491c-98e8-c753f23f6dd1.png)
+#### Darken color
+`Colortils darken <color>`
+
+#### Color to greyscale
+`Colortils greyscale <color>`
+
+#### Pick color on gradient
+`Colortils gradient <color1> <color2>`
 
 #### List css colors
+`Colortils css list`
 
 ![Screenshot 2022-05-31 at 18 56 23](https://user-images.githubusercontent.com/81827001/171230907-313fddc8-29e6-4b97-a842-8ea69ed5b6d5.png)
 
