@@ -116,4 +116,109 @@ function utils_color.complementary(color)
     return "#" .. red .. green .. blue
 end
 
+-- functions from https://github.com/NTBBloodbath/color-converter.nvim
+--- Converts rgb to hsl
+---@param r number
+---@param g number
+---@param b number
+---@param a float
+---@return table
+function utils_color.rgb_to_hsl(r, g, b, a)
+    r = r / 255
+    g = g / 255
+    b = b / 255
+    a = a and a or 0
+
+    local c_max = math.max(r, g, b)
+    local c_min = math.min(r, g, b)
+    local h = 0
+    local s = 0
+    local l = (c_min + c_max) / 2
+
+    local chroma = c_max - c_min
+    if chroma > 0 then
+        s = math.min(
+            (l <= 0.5 and chroma / (2 * l) or chroma / (2 - (2 * l))),
+            1
+        )
+
+        if c_max == r then
+            h = ((g - b) / chroma + (g < b and 6 or 0))
+        elseif c_max == g then
+            h = (b - r) / chroma + 2
+        elseif c_max == b then
+            h = (r - g) / chroma + 4
+        end
+
+        h = h * 60
+        h = math.floor(h + 0.5)
+    end
+
+    return {
+        h,
+        ("%.1f"):format(s * 100),
+        ("%.1f"):format(l * 100),
+        a,
+    }
+end
+
+--- Converts hue to rgb
+---@param p number
+---@param q number
+---@param t number
+---@return number
+local function hue_to_rgb(p, q, t)
+    if t < 0 then
+        t = t + 1
+    end
+    if t > 1 then
+        t = t - 1
+    end
+    if t < 1 / 6 then
+        return p + (q - p) * 6 * t
+    end
+    if t < 1 / 2 then
+        return q
+    end
+    if t < 2 / 3 then
+        return p + (q - p) * (2 / 3 - t) * 6
+    end
+
+    return p
+end
+
+--- Converts hsl to rgb
+---@param h number
+---@param s number
+---@param l number
+---@param a float
+---@return table
+function utils_color.hsl_to_rgb(h, s, l, a)
+    h = h / 360
+    s = s / 100
+    l = l / 100
+    a = a and a / 100 or l
+    local r, g, b
+
+    -- achromatic
+    if s == 0 then
+        r = l
+        g = l
+        b = l
+    else
+        local q = l < 0.5 and l * (1 + s) or l + s - l * s
+        local p = 2 * l - q
+        r = hue_to_rgb(p, q, h + 1 / 3)
+        g = hue_to_rgb(p, q, h)
+        b = hue_to_rgb(p, q, h - 1 / 3)
+    end
+
+    return {
+        math.floor(r * 255 + 0.5),
+        math.floor(g * 255 + 0.5),
+        math.floor(b * 255 + 0.5),
+        a,
+    }
+end
+
 return utils_color
