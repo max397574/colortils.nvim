@@ -1,5 +1,4 @@
 local color_utils = require("colortils.utils.colors")
-local utils = require("colortils.utils")
 local settings = require("colortils").settings
 local idx = 1
 local buf
@@ -22,10 +21,7 @@ local function increase(amount)
         return
     end
     idx = idx + amount
-    if idx > 255 then
-        idx = 255
-    end
-    set_marker()
+    idx = math.min(idx, 255)
 end
 local function decrease(amount)
     amount = amount or 1
@@ -33,10 +29,7 @@ local function decrease(amount)
         return
     end
     idx = idx - amount
-    if idx < 1 then
-        idx = 1
-    end
-    set_marker()
+    idx = math.max(idx, 1)
 end
 
 return function(color, color_2)
@@ -72,6 +65,7 @@ return function(color, color_2)
             line = settings.color_preview
         end
 
+        set_marker()
         vim.api.nvim_buf_set_lines(buf, 2, 3, false, { line })
         vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 2, 0, -1)
     end
@@ -122,18 +116,15 @@ return function(color, color_2)
     })
     vim.keymap.set("n", "$", function()
         idx = 255
-        set_marker()
         update()
     end, {
         buffer = buf,
     })
     vim.keymap.set("n", "0", function()
         idx = 1
-        set_marker()
         update()
     end, {
         buffer = buf,
     })
-    set_marker()
     update()
 end

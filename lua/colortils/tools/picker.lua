@@ -16,6 +16,18 @@ local function update_highlight()
     )
 end
 
+local color_values = {
+    ["1"] = function(value)
+        red = value
+    end,
+    ["2"] = function(value)
+        green = value
+    end,
+    ["3"] = function(value)
+        blue = value
+    end,
+}
+
 local function set_picker_lines()
     local lines = {}
     local red_str = "Red:    "
@@ -83,6 +95,18 @@ end
 
 local value = nil
 
+local function set_color_value(color_value)
+    color_value = math.min(math.max(color_value, 0), 255)
+    local row = vim.api.nvim_win_get_cursor(win)[1]
+    if not vim.tbl_contains({ 1, 2, 3 }, row) then
+        return
+    end
+    color_values[tostring(row)](color_value)
+    update_highlight()
+    set_picker_lines()
+    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
+end
+
 local function set_value()
     local char_nr = vim.fn.getchar()
     local char = vim.fn.nr2char(char_nr)
@@ -97,20 +121,7 @@ local function set_value()
             value = char
         end
     end
-    local row = vim.api.nvim_win_get_cursor(win)[1]
-    if not vim.tbl_contains({ 1, 2, 3 }, row) then
-        return
-    end
-    if row == 1 then
-        red = math.max(math.min(tonumber(value), 255), 0)
-    elseif row == 2 then
-        green = math.max(math.min(tonumber(value), 255), 0)
-    elseif row == 3 then
-        blue = math.max(math.min(tonumber(value), 255), 0)
-    end
-    update_highlight()
-    set_picker_lines()
-    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
+    set_color_value(tonumber(value))
     vim.cmd("redraw")
     set_value()
 end
@@ -148,39 +159,12 @@ local function create_mappings()
         buffer = buf,
     })
     vim.keymap.set("n", "$", function()
-        local row = vim.api.nvim_win_get_cursor(win)[1]
-        print(row)
-        if not vim.tbl_contains({ 1, 2, 3 }, row) then
-            return
-        end
-        if row == 1 then
-            red = 255
-        elseif row == 2 then
-            green = 255
-        elseif row == 3 then
-            blue = 255
-        end
-        update_highlight()
-        set_picker_lines()
-        vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
+        set_color_value(255)
     end, {
         buffer = buf,
     })
     vim.keymap.set("n", "0", function()
-        local row = vim.api.nvim_win_get_cursor(win)[1]
-        if not vim.tbl_contains({ 1, 2, 3 }, row) then
-            return
-        end
-        if row == 1 then
-            red = 0
-        elseif row == 2 then
-            green = 0
-        elseif row == 3 then
-            blue = 0
-        end
-        update_highlight()
-        set_picker_lines()
-        vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
+        set_color_value(0)
     end, {
         buffer = buf,
     })
