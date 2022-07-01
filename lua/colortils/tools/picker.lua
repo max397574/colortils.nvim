@@ -10,8 +10,6 @@ local ns = vim.api.nvim_create_namespace("ColorPicker")
 local old_cursor = vim.opt.guicursor
 local old_cursor_pos = { 0, 1 }
 local transparency = nil
-local bg_win
-local bg_buf
 
 local function update_highlight()
     vim.api.nvim_set_hl(
@@ -20,7 +18,7 @@ local function update_highlight()
         { fg = "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue) }
     )
     if transparency then
-        vim.api.nvim_set_hl(0, "ColorPickerPreviewBlended", {
+        vim.api.nvim_set_hl(0, "ColorPickerPreview", {
             fg = color_utils.blend_colors(
                 "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue),
                 "#"
@@ -48,14 +46,43 @@ local color_values = {
 
 local format_strings = {
     ["hex"] = function()
-        return "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
+        if transparency then
+            return "#"
+                .. utils.hex(red)
+                .. utils.hex(green)
+                .. utils.hex(blue)
+                .. utils.hex(transparency / 100 * 255)
+        else
+            return "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
+        end
     end,
     ["rgb"] = function()
-        return "rgb(" .. red .. ", " .. green .. ", " .. blue .. ")"
+        if transparency then
+            return "rgb("
+                .. red
+                .. ", "
+                .. green
+                .. ", "
+                .. blue
+                .. ", "
+                .. transparency / 100
+                .. ")"
+        else
+            return "rgb(" .. red .. ", " .. green .. ", " .. blue .. ")"
+        end
     end,
     ["hsl"] = function()
-        local h, s, l = unpack(color_utils.rgb_to_hsl(red, green, blue))
-        return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%)"
+        if transparency then
+            local h, s, l, a = unpack(
+                color_utils.rgb_to_hsl(red, green, blue, transparency / 100)
+            )
+            return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%, " .. a .. ")"
+        else
+            local h, s, l = unpack(
+                color_utils.rgb_to_hsl(red, green, blue, transparency / 100)
+            )
+            return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%)"
+        end
     end,
 }
 
@@ -100,18 +127,6 @@ local function set_picker_lines()
                 .. utils.get_bar(transparency, 100, 10)
             table.insert(lines, transparency_string)
         end
-
-        vim.api.nvim_buf_set_lines(bg_buf, 0, -1, false, {
-            "███████████████████████████",
-        })
-        vim.api.nvim_buf_add_highlight(
-            bg_buf,
-            ns,
-            "ColorPickerPreviewBlended",
-            0,
-            0,
-            -1
-        )
     end
     vim.api.nvim_buf_set_option(buf, "modifiable", true)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -138,7 +153,6 @@ local function adjust_color(amount)
 end
 
 local function confirm_select()
-    transparency = nil
     vim.api.nvim_win_close(win, true)
     vim.api.nvim_buf_delete(buf, {})
     buf = nil
@@ -152,23 +166,20 @@ local function confirm_select()
     }, function(item, idx)
         item = item:sub(1, 3)
         vim.fn.setreg(colortils.settings.register, format_strings[item]())
+        transparency = nil
     end)
 end
 
 local function confirm()
-    transparency = nil
     vim.api.nvim_win_close(win, true)
-    if bg_win then
-        vim.api.nvim_win_close(bg_win, true)
-    end
     vim.api.nvim_buf_delete(buf, {})
     buf = nil
-    bg_win = nil
     win = nil
     vim.fn.setreg(
         colortils.settings.register,
         format_strings[colortils.settings.default_format]()
     )
+    transparency = nil
 end
 
 local value = nil
@@ -207,12 +218,8 @@ end
 local function create_mappings()
     vim.keymap.set("n", "q", function()
         vim.api.nvim_win_close(win, true)
-        if bg_win then
-            vim.api.nvim_win_close(bg_win, true)
-        end
         vim.api.nvim_buf_delete(buf, {})
         buf = nil
-        bg_win = nil
         win = nil
         transparency = nil
     end, {
@@ -267,22 +274,8 @@ local function create_mappings()
         if not transparency then
             vim.api.nvim_win_set_height(win, 6)
             transparency = 0
-            bg_buf = vim.api.nvim_create_buf(false, true)
-            local row = vim.api.nvim_win_get_cursor(win)[1]
-            bg_win = vim.api.nvim_open_win(bg_buf, false, {
-                relative = "cursor",
-                width = 30,
-                zindex = 1,
-                col = -1,
-                row = -4 - row+1,
-                style = "minimal",
-                height = 1,
-                border = colortils.settings.border,
-            })
             vim.cmd([[redraw]])
         else
-            vim.api.nvim_win_close(bg_win, true)
-            bg_win = nil
             vim.api.nvim_win_set_height(win, 5)
             transparency = nil
         end
