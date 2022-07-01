@@ -11,6 +11,7 @@ local old_cursor = vim.opt.guicursor
 local old_cursor_pos = { 0, 1 }
 local transparency = nil
 
+--- Updates the highlight used for the preview
 local function update_highlight()
     vim.api.nvim_set_hl(
         0,
@@ -86,6 +87,7 @@ local format_strings = {
     end,
 }
 
+--- Sets the lines in the picker
 local function set_picker_lines()
     local lines = {}
     local red_str = "Red:    "
@@ -133,6 +135,8 @@ local function set_picker_lines()
     vim.api.nvim_buf_set_option(buf, "modifiable", false)
 end
 
+--- Adjusts a color value
+---@param amount number
 local function adjust_color(amount)
     local row = vim.api.nvim_win_get_cursor(win)[1]
     if not vim.tbl_contains({ 1, 2, 3, 6 }, row) then
@@ -152,6 +156,7 @@ local function adjust_color(amount)
     vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
 end
 
+--- Confirm color and choose format
 local function confirm_select()
     vim.api.nvim_win_close(win, true)
     vim.api.nvim_buf_delete(buf, {})
@@ -163,13 +168,14 @@ local function confirm_select()
         "hsl: " .. format_strings["hsl"](),
     }, {
         prompt = "Choose format",
-    }, function(item, idx)
+    }, function(item)
         item = item:sub(1, 3)
         vim.fn.setreg(colortils.settings.register, format_strings[item]())
         transparency = nil
     end)
 end
 
+--- Confirm color and save with default format
 local function confirm()
     vim.api.nvim_win_close(win, true)
     vim.api.nvim_buf_delete(buf, {})
@@ -184,6 +190,8 @@ end
 
 local value = nil
 
+--- Sets a color value to a certain value
+---@param color_value number
 local function set_color_value(color_value)
     color_value = math.min(math.max(color_value, 0), 255)
     local row = vim.api.nvim_win_get_cursor(win)[1]
@@ -215,6 +223,7 @@ local function set_value()
     set_value()
 end
 
+--- Create the mappings for the picker buffer
 local function create_mappings()
     vim.keymap.set("n", "q", function()
         vim.api.nvim_win_close(win, true)

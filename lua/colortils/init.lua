@@ -11,19 +11,16 @@ colortils.settings = {
         increment_big = "L",
         decrement_big = "H",
     },
-    window = {
-        relative = "cursor",
-        width = 30,
-        col = 0,
-        row = 0,
-        height = 5,
-    },
 }
 
 local utils = require("colortils.utils")
 local css = require("colortils.css")
 local log = require("colortils.log")
 
+--- Gets a color to be used with the tools
+---@param color string
+---@param invalid boolean
+---@return string Color
 local function get_color(color, invalid)
     color = color or ""
     if color:match("^#%x%x%x%x%x%x$") then
@@ -73,10 +70,13 @@ local commands = {
     end,
 }
 
+--- Executes command
+---@param args table
 local function exec_command(args)
     commands[args.fargs[1]](args)
 end
 
+--- Creates the `Colortils` command
 local function create_command()
     vim.api.nvim_create_user_command("Colortils", function(args)
         exec_command(args)
@@ -89,6 +89,8 @@ local function create_command()
     })
 end
 
+--- Main setup function
+---@param update table
 function colortils.setup(update)
     local updated_settings = vim.tbl_deep_extend(
         "force",
