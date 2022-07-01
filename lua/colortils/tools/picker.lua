@@ -29,6 +29,19 @@ local color_values = {
     end,
 }
 
+local format_strings = {
+    ["hex"] = function()
+        return "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
+    end,
+    ["rgb"] = function()
+        return "rgb(" .. red .. ", " .. green .. ", " .. blue .. ")"
+    end,
+    ["hsl"] = function()
+        local h, s, l = unpack(color_utils.rgb_to_hsl(red, green, blue))
+        return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%)"
+    end,
+}
+
 local function set_picker_lines()
     local lines = {}
     local red_str = "Red:    "
@@ -55,7 +68,7 @@ local function set_picker_lines()
             lines,
             string.format(
                 colortils.settings.color_preview,
-                "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
+                format_strings[colortils.settings.default_format]()
             )
         )
     else
@@ -83,6 +96,23 @@ local function adjust_color(amount)
     vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
 end
 
+local function confirm_select()
+    vim.api.nvim_win_close(win, true)
+    vim.api.nvim_buf_delete(buf, {})
+    buf = nil
+    win = nil
+    vim.ui.select({
+        "hex: " .. format_strings["hex"](),
+        "rgb: " .. format_strings["rgb"](),
+        "hsl: " .. format_strings["hsl"](),
+    }, {
+        prompt = "Choose format",
+    }, function(item, idx)
+        item = item:sub(1, 3)
+        vim.fn.setreg(colortils.settings.register, format_strings[item]())
+    end)
+end
+
 local function confirm()
     vim.api.nvim_win_close(win, true)
     vim.api.nvim_buf_delete(buf, {})
@@ -90,7 +120,7 @@ local function confirm()
     win = nil
     vim.fn.setreg(
         colortils.settings.register,
-        "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
+        format_strings[colortils.settings.default_format]()
     )
 end
 
@@ -156,6 +186,11 @@ local function create_mappings()
     })
     vim.keymap.set("n", "<cr>", function()
         confirm()
+    end, {
+        buffer = buf,
+    })
+    vim.keymap.set("n", "g<cr>", function()
+        confirm_select()
     end, {
         buffer = buf,
     })
