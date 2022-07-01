@@ -117,7 +117,7 @@ end
 
 local function create_mappings()
     vim.keymap.set("n", "q", "<cmd>q<cr>", { buffer = buf })
-    vim.keymap.set("n", "<c-n>", function()
+    vim.keymap.set("n", "c", function()
         set_value()
     end, {
         buffer = buf,
