@@ -11,13 +11,6 @@ colortils.settings = {
         increment_big = "L",
         decrement_big = "H",
     },
-    window = {
-        relative = "cursor",
-        width = 30,
-        col = 0,
-        row = 0,
-        height = 5,
-    },
 }
 
 local utils = require("colortils.utils")
