@@ -29,6 +29,19 @@ local color_values = {
     end,
 }
 
+local format_strings = {
+    ["hex"] = function()
+        return "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
+    end,
+    ["rgb"] = function()
+        return "rgb(" .. red .. ", " .. green .. ", " .. blue .. ")"
+    end,
+    ["hsl"] = function()
+        local h, s, l = color_utils.rgb_to_hsl(red, green, blue)
+        return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%)"
+    end,
+}
+
 local function set_picker_lines()
     local lines = {}
     local red_str = "Red:    "
@@ -55,7 +68,7 @@ local function set_picker_lines()
             lines,
             string.format(
                 colortils.settings.color_preview,
-                "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
+                format_strings[colortils.settings.default_format]()
             )
         )
     else
@@ -82,19 +95,6 @@ local function adjust_color(amount)
     set_picker_lines()
     vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
 end
-
-local format_strings = {
-    ["hex"] = function()
-        return "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
-    end,
-    ["rgb"] = function()
-        return "rgb(" .. red .. ", " .. green .. ", " .. blue .. ")"
-    end,
-    ["hsl"] = function()
-        local h, s, l = color_utils.rgb_to_hsl(red, green, blue)
-        return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%)"
-    end,
-}
 
 local function confirm_select()
     vim.api.nvim_win_close(win, true)
