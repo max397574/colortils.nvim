@@ -4,6 +4,8 @@ colortils.settings = {
     register = "+",
     ---String: preview text. %s is color value
     color_preview = "█ %s",
+    ---String: "hex"|"rgb"|"hsl"
+    default_format = "hex",
     border = "rounded",
     mappings = {
         increment_big = "L",

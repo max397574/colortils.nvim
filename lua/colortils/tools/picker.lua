@@ -83,6 +83,19 @@ local function adjust_color(amount)
     vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
 end
 
+local format_strings = {
+    ["hex"] = function()
+        return "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
+    end,
+    ["rgb"] = function()
+        return "rgb(" .. red .. ", " .. green .. ", " .. blue .. ")"
+    end,
+    ["hsl"] = function()
+        local h, s, l = color_utils.rgb_to_hsl(red, green, blue)
+        return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%)"
+    end,
+}
+
 local function confirm()
     vim.api.nvim_win_close(win, true)
     vim.api.nvim_buf_delete(buf, {})
@@ -90,7 +103,7 @@ local function confirm()
     win = nil
     vim.fn.setreg(
         colortils.settings.register,
-        "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
+        format_strings[colortils.settings.default_format]()
     )
 end
 
