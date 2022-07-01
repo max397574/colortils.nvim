@@ -96,6 +96,20 @@ local format_strings = {
     end,
 }
 
+local function confirm_select()
+    vim.api.nvim_win_close(win, true)
+    vim.api.nvim_buf_delete(buf, {})
+    buf = nil
+    win = nil
+    vim.ui.select(
+        { "hex", "rgb", "hsl" },
+        { prompt = "Choose format" },
+        function(item, idx)
+            vim.fn.setreg(colortils.settings.register, format_strings[item]())
+        end
+    )
+end
+
 local function confirm()
     vim.api.nvim_win_close(win, true)
     vim.api.nvim_buf_delete(buf, {})
@@ -169,6 +183,11 @@ local function create_mappings()
     })
     vim.keymap.set("n", "<cr>", function()
         confirm()
+    end, {
+        buffer = buf,
+    })
+    vim.keymap.set("n", "g<cr>", function()
+        confirm_select()
     end, {
         buffer = buf,
     })
