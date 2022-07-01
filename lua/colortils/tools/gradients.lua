@@ -120,6 +120,20 @@ return function(color, color_2)
         buffer = buf,
         noremap = true,
     })
+    vim.keymap.set("n", "$", function()
+        idx = 255
+        set_marker()
+        update()
+    end, {
+        buffer = buf,
+    })
+    vim.keymap.set("n", "0", function()
+        idx = 1
+        set_marker()
+        update()
+    end, {
+        buffer = buf,
+    })
     set_marker()
     update()
 end
