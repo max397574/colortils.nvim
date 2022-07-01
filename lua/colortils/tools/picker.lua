@@ -9,6 +9,9 @@ local color_utils = require("colortils.utils.colors")
 local ns = vim.api.nvim_create_namespace("ColorPicker")
 local old_cursor = vim.opt.guicursor
 local old_cursor_pos = { 0, 1 }
+local transparency = nil
+local bg_win
+local bg_buf
 
 local function update_highlight()
     vim.api.nvim_set_hl(
@@ -16,6 +19,19 @@ local function update_highlight()
         "ColorPickerPreview",
         { fg = "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue) }
     )
+    if transparency then
+        vim.api.nvim_set_hl(0, "ColorPickerPreviewBlended", {
+            fg = color_utils.blend_colors(
+                "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue),
+                "#"
+                    .. string.format(
+                        "%x",
+                        vim.api.nvim_get_hl_by_name("Normal", true).background
+                    ),
+                (100 - transparency) / 100
+            ),
+        })
+    end
 end
 
 local color_values = {
@@ -75,6 +91,28 @@ local function set_picker_lines()
     else
         table.insert(lines, colortils.settings.color_preview)
     end
+    if transparency then
+        if transparency then
+            local transparency_string = "Transparency: "
+                .. string.rep(" ", 3 - #tostring(transparency))
+                .. transparency
+                .. " "
+                .. utils.get_bar(transparency, 100, 10)
+            table.insert(lines, transparency_string)
+        end
+
+        vim.api.nvim_buf_set_lines(bg_buf, 0, -1, false, {
+            "███████████████████████████",
+        })
+        vim.api.nvim_buf_add_highlight(
+            bg_buf,
+            ns,
+            "ColorPickerPreviewBlended",
+            0,
+            0,
+            -1
+        )
+    end
     vim.api.nvim_buf_set_option(buf, "modifiable", true)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     vim.api.nvim_buf_set_option(buf, "modifiable", false)
@@ -82,7 +120,7 @@ end
 
 local function adjust_color(amount)
     local row = vim.api.nvim_win_get_cursor(win)[1]
-    if not vim.tbl_contains({ 1, 2, 3 }, row) then
+    if not vim.tbl_contains({ 1, 2, 3, 6 }, row) then
         return
     end
     if row == 1 then
@@ -91,6 +129,8 @@ local function adjust_color(amount)
         green = utils.adjust_value(green, amount)
     elseif row == 3 then
         blue = utils.adjust_value(blue, amount)
+    elseif row == 6 then
+        transparency = math.max(math.min(transparency + amount, 100), 0)
     end
     update_highlight()
     set_picker_lines()
@@ -98,6 +138,7 @@ local function adjust_color(amount)
 end
 
 local function confirm_select()
+    transparency = nil
     vim.api.nvim_win_close(win, true)
     vim.api.nvim_buf_delete(buf, {})
     buf = nil
@@ -115,9 +156,14 @@ local function confirm_select()
 end
 
 local function confirm()
+    transparency = nil
     vim.api.nvim_win_close(win, true)
+    if bg_win then
+        vim.api.nvim_win_close(bg_win, true)
+    end
     vim.api.nvim_buf_delete(buf, {})
     buf = nil
+    bg_win = nil
     win = nil
     vim.fn.setreg(
         colortils.settings.register,
@@ -159,7 +205,19 @@ local function set_value()
 end
 
 local function create_mappings()
-    vim.keymap.set("n", "q", "<cmd>q<cr>", { buffer = buf })
+    vim.keymap.set("n", "q", function()
+        vim.api.nvim_win_close(win, true)
+        if bg_win then
+            vim.api.nvim_win_close(bg_win, true)
+        end
+        vim.api.nvim_buf_delete(buf, {})
+        buf = nil
+        bg_win = nil
+        win = nil
+        transparency = nil
+    end, {
+        buffer = buf,
+    })
     vim.keymap.set("n", "c", function()
         set_value()
     end, {
@@ -205,6 +263,35 @@ local function create_mappings()
     end, {
         buffer = buf,
     })
+    vim.keymap.set("n", "T", function()
+        if not transparency then
+            vim.api.nvim_win_set_height(win, 6)
+            transparency = 0
+            bg_buf = vim.api.nvim_create_buf(false, true)
+            local row = vim.api.nvim_win_get_cursor(win)[1]
+            bg_win = vim.api.nvim_open_win(bg_buf, false, {
+                relative = "cursor",
+                width = 30,
+                zindex = 1,
+                col = -1,
+                row = -4 - row+1,
+                style = "minimal",
+                height = 1,
+                border = colortils.settings.border,
+            })
+            vim.cmd([[redraw]])
+        else
+            vim.api.nvim_win_close(bg_win, true)
+            bg_win = nil
+            vim.api.nvim_win_set_height(win, 5)
+            transparency = nil
+        end
+        update_highlight()
+        set_picker_lines()
+        vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
+    end, {
+        buffer = buf,
+    })
 end
 
 return function(color)
@@ -215,27 +302,42 @@ return function(color)
     win = vim.api.nvim_open_win(buf, true, {
         relative = "cursor",
         width = 30,
-        col = 0,
-        row = 0,
+        zindex = 100,
+        col = 1,
+        row = 1,
         style = "minimal",
         height = 5,
         border = colortils.settings.border,
     })
+    vim.api.nvim_set_hl(0, "ColortilsBlack", { fg = "#000000" })
     vim.opt.guicursor = "a:ver1-Normal/Normal"
     vim.api.nvim_create_autocmd("CursorMoved", {
         callback = function()
             local cursor = vim.api.nvim_win_get_cursor(win)
             local row = old_cursor_pos[1]
+            local bigger = false
             if
                 cursor[1] > old_cursor_pos[1]
                 or cursor[2] > old_cursor_pos[2]
             then
-                row = math.min((old_cursor_pos[1] + 1), 3)
+                bigger = true
+                if transparency then
+                    row = math.min((old_cursor_pos[1] + 1), 6)
+                else
+                    row = math.min((old_cursor_pos[1] + 1), 3)
+                end
             elseif
                 cursor[1] < old_cursor_pos[1]
                 or cursor[2] < old_cursor_pos[2]
             then
                 row = math.max(old_cursor_pos[1] - 1, 1)
+            end
+            if vim.tbl_contains({ 4, 5 }, row) then
+                if bigger then
+                    row = 6
+                else
+                    row = 3
+                end
             end
             vim.api.nvim_win_set_cursor(win, { row, 0 })
             vim.api.nvim_buf_clear_namespace(buf, ns, 0, 3)
