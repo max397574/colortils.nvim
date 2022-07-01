@@ -8,6 +8,7 @@ local utils = require("colortils.utils")
 local color_utils = require("colortils.utils.colors")
 local ns = vim.api.nvim_create_namespace("ColorPicker")
 local old_cursor = vim.opt.guicursor
+local old_cursor_pos = { 0, 1 }
 
 local function update_highlight()
     vim.api.nvim_set_hl(
@@ -221,6 +222,28 @@ return function(color)
         border = colortils.settings.border,
     })
     vim.opt.guicursor = "a:ver1-Normal/Normal"
+    vim.api.nvim_create_autocmd("CursorMoved", {
+        callback = function()
+            local cursor = vim.api.nvim_win_get_cursor(win)
+            local row = old_cursor_pos[1]
+            if
+                cursor[1] > old_cursor_pos[1]
+                or cursor[2] > old_cursor_pos[2]
+            then
+                row = math.min((old_cursor_pos[1] + 1), 3)
+            elseif
+                cursor[1] < old_cursor_pos[1]
+                or cursor[2] < old_cursor_pos[2]
+            then
+                row = math.max(old_cursor_pos[1] - 1, 1)
+            end
+            vim.api.nvim_win_set_cursor(win, { row, 0 })
+            vim.api.nvim_buf_clear_namespace(buf, ns, 0, 3)
+            vim.api.nvim_buf_add_highlight(buf, ns, "Bold", row - 1, 0, -1)
+            old_cursor_pos = { row, 0 }
+        end,
+        buffer = buf,
+    })
     vim.api.nvim_create_autocmd("BufLeave", {
         callback = function()
             vim.opt.guicursor = old_cursor

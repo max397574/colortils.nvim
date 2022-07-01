@@ -45,6 +45,12 @@ return function(color, color_2)
     })
     color_utils.display_gradient(buf, ns, 0, color, color_2, 51)
     vim.opt.guicursor = "a:ver1-Normal/Normal"
+    vim.api.nvim_create_autocmd("CursorMoved", {
+        callback = function()
+            vim.api.nvim_win_set_cursor(win, { 2, 1 })
+        end,
+        buffer = buf,
+    })
     vim.api.nvim_create_autocmd("BufLeave", {
         callback = function()
             vim.opt.guicursor = old_cursor
