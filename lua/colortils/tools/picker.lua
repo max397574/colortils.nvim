@@ -37,7 +37,7 @@ local format_strings = {
         return "rgb(" .. red .. ", " .. green .. ", " .. blue .. ")"
     end,
     ["hsl"] = function()
-        local h, s, l = color_utils.rgb_to_hsl(red, green, blue)
+        local h, s, l = unpack(color_utils.rgb_to_hsl(red, green, blue))
         return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%)"
     end,
 }
@@ -101,13 +101,16 @@ local function confirm_select()
     vim.api.nvim_buf_delete(buf, {})
     buf = nil
     win = nil
-    vim.ui.select(
-        { "hex", "rgb", "hsl" },
-        { prompt = "Choose format" },
-        function(item, idx)
-            vim.fn.setreg(colortils.settings.register, format_strings[item]())
-        end
-    )
+    vim.ui.select({
+        "hex: " .. format_strings["hex"](),
+        "rgb: " .. format_strings["rgb"](),
+        "hsl: " .. format_strings["hsl"](),
+    }, {
+        prompt = "Choose format",
+    }, function(item, idx)
+        item = item:sub(1, 3)
+        vim.fn.setreg(colortils.settings.register, format_strings[item]())
+    end)
 end
 
 local function confirm()
