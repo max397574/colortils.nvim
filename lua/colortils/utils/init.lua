@@ -22,12 +22,6 @@ function utils.round_float(number)
     end
 end
 
---- Creates common mappings for a buffer
----@param buf number
-function utils.create_mappings(buf)
-    vim.keymap.set("n", "q", "<cmd>q<cr>", { buffer = buf })
-end
-
 --- Adjust a color value (with maximum and minimum)
 ---@param value number
 ---@param amount number

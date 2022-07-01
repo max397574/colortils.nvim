@@ -5,6 +5,7 @@ local buf
 local ns = vim.api.nvim_create_namespace("colortils_gradient")
 local old_cursor = vim.opt.guicursor
 
+--- Sets the marker which indeicates position on the gradient
 local function set_marker()
     vim.api.nvim_buf_set_lines(
         buf,
@@ -15,6 +16,8 @@ local function set_marker()
     )
 end
 
+--- Increases index
+---@param amount number
 local function increase(amount)
     amount = amount or 1
     if idx >= 51 * 5 then
@@ -23,6 +26,9 @@ local function increase(amount)
     idx = idx + amount
     idx = math.min(idx, 255)
 end
+
+--- Decreases index
+---@param amount number
 local function decrease(amount)
     amount = amount or 1
     if idx <= 1 then
