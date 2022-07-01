@@ -7,6 +7,7 @@ local colortils = require("colortils")
 local utils = require("colortils.utils")
 local color_utils = require("colortils.utils.colors")
 local ns = vim.api.nvim_create_namespace("ColorPicker")
+local old_cursor = vim.opt.guicursor
 
 local function update_highlight()
     vim.api.nvim_set_hl(
@@ -183,6 +184,12 @@ return function(color)
         style = "minimal",
         height = 5,
         border = colortils.settings.border,
+    })
+    vim.opt.guicursor = "a:ver1-Normal/Normal"
+    vim.api.nvim_create_autocmd("BufLeave", {
+        callback = function()
+            vim.opt.guicursor = old_cursor
+        end,
     })
     update_highlight()
     set_picker_lines()
