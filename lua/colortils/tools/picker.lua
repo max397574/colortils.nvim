@@ -81,8 +81,47 @@ local function confirm()
     )
 end
 
+local value = nil
+
+local function set_value()
+    local char_nr = vim.fn.getchar()
+    local char = vim.fn.nr2char(char_nr)
+    if not char:match("%d") then
+        vim.api.nvim_input(char)
+        value = nil
+        return
+    else
+        if value then
+            value = value .. char
+        else
+            value = char
+        end
+    end
+    local row = vim.api.nvim_win_get_cursor(win)[1]
+    if not vim.tbl_contains({ 1, 2, 3 }, row) then
+        return
+    end
+    if row == 1 then
+        red = math.max(math.min(tonumber(value), 255), 0)
+    elseif row == 2 then
+        green = math.max(math.min(tonumber(value), 255), 0)
+    elseif row == 3 then
+        blue = math.max(math.min(tonumber(value), 255), 0)
+    end
+    update_highlight()
+    set_picker_lines()
+    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
+    vim.cmd("redraw")
+    set_value()
+end
+
 local function create_mappings()
     vim.keymap.set("n", "q", "<cmd>q<cr>", { buffer = buf })
+    vim.keymap.set("n", "<c-n>", function()
+        set_value()
+    end, {
+        buffer = buf,
+    })
     vim.keymap.set("n", "l", function()
         adjust_color(1)
     end, {
