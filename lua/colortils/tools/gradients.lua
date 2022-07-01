@@ -22,9 +22,7 @@ local function increase(amount)
         return
     end
     idx = idx + amount
-    if idx > 255 then
-        idx = 255
-    end
+    idx = math.min(idx, 255)
     set_marker()
 end
 local function decrease(amount)
@@ -33,9 +31,7 @@ local function decrease(amount)
         return
     end
     idx = idx - amount
-    if idx < 1 then
-        idx = 1
-    end
+    idx = math.max(idx, 1)
     set_marker()
 end
 

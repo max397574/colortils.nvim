@@ -7,11 +7,7 @@ local log = require("colortils.log")
 ---@param number number
 ---@return string
 function utils.hex(number)
-    if number > 255 then
-        number = 255
-    elseif number < 0 then
-        number = 0
-    end
+    number = math.max(math.min(number, 255), 0)
     return string.format("%02X", number)
 end
 
@@ -38,13 +34,7 @@ end
 ---@return number adjusted
 function utils.adjust_value(value, amount)
     value = value + amount
-    if value > 255 then
-        value = 255
-    end
-    if value < 0 then
-        value = 0
-    end
-    return value
+    return math.max(math.min(value, 255), 0)
 end
 
 --- Gets a partial block for a number between 0 and 1
