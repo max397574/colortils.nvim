@@ -83,16 +83,16 @@ return function(color, color_2)
         vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 2, 0, -1)
     end
     local function get_color(invalid)
-        local color
+        local input_color
         if invalid then
-            color = vim.fn.input("Input a valid color > ", "#RRGGBB")
+            input_color = vim.fn.input("Input a valid color > ", "#RRGGBB")
         else
-            color = vim.fn.input("Input a color > ", "#RRGGBB")
+            input_color = vim.fn.input("Input a color > ", "#RRGGBB")
         end
-        if not color:match("^#%x%x%x%x%x%x$") then
-            color = get_color(true)
+        if not input_color:match("^#%x%x%x%x%x%x$") then
+            input_color = get_color(true)
         end
-        return color
+        return input_color
     end
 
     local tools = {
