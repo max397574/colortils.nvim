@@ -365,7 +365,7 @@ return function(color)
         height = 5,
         border = colortils.settings.border,
     })
-    vim.api.nvim_win_set_option(win,"cursorline",false)
+    vim.api.nvim_win_set_option(win, "cursorline", false)
     vim.api.nvim_set_hl(0, "ColortilsBlack", { fg = "#000000" })
     vim.opt.guicursor = "a:ver1-Normal/Normal"
     vim.api.nvim_create_autocmd("CursorMoved", {
