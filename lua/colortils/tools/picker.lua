@@ -223,6 +223,57 @@ local function set_value()
     set_value()
 end
 
+local function get_color(invalid)
+    local color
+    if invalid then
+        color = vim.fn.input("Input a valid color > ", "#RRGGBB")
+    else
+        color = vim.fn.input("Input a color > ", "#RRGGBB")
+    end
+    if not color:match("^#%x%x%x%x%x%x$") then
+        color = get_color(true)
+    end
+    return color
+end
+
+local tools = {
+    ["Picker"] = function(hex_color)
+        require("colortils.tools.picker")(hex_color)
+    end,
+    ["Gradient"] = function(hex_color)
+        local second_color = get_color()
+        require("colortils.tools.gradients.colors")(hex_color, second_color)
+    end,
+    ["Greyscale"] = function(hex_color)
+        require("colortils.tools.gradients.greyscale")(hex_color)
+    end,
+    ["Lighten"] = function(hex_color)
+        require("colortils.tools.lighten")(hex_color)
+    end,
+    ["Darken"] = function(hex_color)
+        require("colortils.tools.darken")(hex_color)
+    end,
+}
+
+local function export()
+    vim.api.nvim_win_close(win, true)
+    vim.api.nvim_buf_delete(buf, {})
+    buf = nil
+    win = nil
+    transparency = nil
+    vim.ui.select(
+        { "Picker", "Gradient", "Greyscale", "Lighten", "Darken" },
+        { prompt = "Choose tool" },
+        function(item)
+            local hex_color = "#"
+                .. utils.hex(red)
+                .. utils.hex(green)
+                .. utils.hex(blue)
+            tools[item](hex_color)
+        end
+    )
+end
+
 --- Create the mappings for the picker buffer
 local function create_mappings()
     vim.keymap.set("n", "q", function()
@@ -294,6 +345,9 @@ local function create_mappings()
     end, {
         buffer = buf,
     })
+    vim.keymap.set("n", "E", function()
+        export()
+    end, { buffer = buf })
 end
 
 return function(color)
@@ -311,6 +365,7 @@ return function(color)
         height = 5,
         border = colortils.settings.border,
     })
+    vim.api.nvim_win_set_option(win,"cursorline",false)
     vim.api.nvim_set_hl(0, "ColortilsBlack", { fg = "#000000" })
     vim.opt.guicursor = "a:ver1-Normal/Normal"
     vim.api.nvim_create_autocmd("CursorMoved", {
