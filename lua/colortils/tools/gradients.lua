@@ -81,6 +81,32 @@ return function(color, color_2)
         vim.api.nvim_buf_set_lines(buf, 2, 3, false, { line })
         vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 2, 0, -1)
     end
+    local format_strings = {
+        ["hex"] = function()
+            return gradient_big[idx]
+        end,
+        ["rgb"] = function()
+            local picked_color = gradient_big[idx]
+            return "rgb("
+                .. picked_color:sub(2, 3)
+                .. ", "
+                .. picked_color:sub(4, 5)
+                .. ", "
+                .. picked_color:sub(6, 7)
+                .. ")"
+        end,
+        ["hsl"] = function()
+            local picked_color = gradient_big[idx]
+            local h, s, l = unpack(
+                color_utils.rgb_to_hsl(
+                    tonumber(picked_color:sub(2, 3), 16),
+                    tonumber(picked_color:sub(4, 5), 16),
+                    tonumber(picked_color:sub(6, 7), 16)
+                )
+            )
+            return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%)"
+        end,
+    }
 
     vim.keymap.set("n", "l", function()
         increase()
@@ -113,11 +139,33 @@ return function(color, color_2)
         vim.api.nvim_buf_delete(buf, {})
         buf = nil
         win = nil
-        vim.fn.setreg(settings.register, gradient_big[idx])
-        idx = 0
+        vim.fn.setreg(
+            settings.register,
+            format_strings[settings.default_format]()
+        )
+        idx = 1
     end, {
         buffer = buf,
         noremap = true,
+    })
+    vim.keymap.set("n", "g<cr>", function()
+        vim.api.nvim_win_close(win, true)
+        vim.api.nvim_buf_delete(buf, {})
+        buf = nil
+        win = nil
+        vim.ui.select({
+            "hex: " .. format_strings["hex"](),
+            "rgb: " .. format_strings["rgb"](),
+            "hsl: " .. format_strings["hsl"](),
+        }, {
+            prompt = "Choose format",
+        }, function(item)
+            item = item:sub(1, 3)
+            vim.fn.setreg(settings.register, format_strings[item]())
+            idx = 1
+        end)
+    end, {
+        buffer = buf,
     })
     vim.keymap.set("n", settings.mappings.decrement_big, function()
         decrease(5)
