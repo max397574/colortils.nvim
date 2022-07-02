@@ -91,6 +91,8 @@ With `q` you can close the tools.
 With most tools you can use `<cr>` to save the currently selected color to the register speicified in the config.
 If this isn't the case or something is special it will be written below.
 
+You can use `E` to export the currently selected color to a different tool and modify it there.
+
 #### Color Picker
 `Colortils picker <color>`
 

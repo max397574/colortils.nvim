@@ -49,6 +49,7 @@ return function(color, color_2)
         height = 3,
         border = settings.border,
     })
+    vim.api.nvim_win_set_option(win, "cursorline", false)
     color_utils.display_gradient(buf, ns, 0, color, color_2, 51)
     vim.opt.guicursor = "a:ver1-Normal/Normal"
     vim.api.nvim_create_autocmd("CursorMoved", {
@@ -81,6 +82,53 @@ return function(color, color_2)
         vim.api.nvim_buf_set_lines(buf, 2, 3, false, { line })
         vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 2, 0, -1)
     end
+    local function get_color(invalid)
+        local color
+        if invalid then
+            color = vim.fn.input("Input a valid color > ", "#RRGGBB")
+        else
+            color = vim.fn.input("Input a color > ", "#RRGGBB")
+        end
+        if not color:match("^#%x%x%x%x%x%x$") then
+            color = get_color(true)
+        end
+        return color
+    end
+
+    local tools = {
+        ["Picker"] = function(hex_color)
+            require("colortils.tools.picker")(hex_color)
+        end,
+        ["Gradient"] = function(hex_color)
+            local second_color = get_color()
+            require("colortils.tools.gradients.colors")(hex_color, second_color)
+        end,
+        ["Greyscale"] = function(hex_color)
+            require("colortils.tools.gradients.greyscale")(hex_color)
+        end,
+        ["Lighten"] = function(hex_color)
+            require("colortils.tools.lighten")(hex_color)
+        end,
+        ["Darken"] = function(hex_color)
+            require("colortils.tools.darken")(hex_color)
+        end,
+    }
+
+    local function export()
+        vim.api.nvim_win_close(win, true)
+        vim.api.nvim_buf_delete(buf, {})
+        buf = nil
+        win = nil
+        vim.ui.select(
+            { "Picker", "Gradient", "Greyscale", "Lighten", "Darken" },
+            { prompt = "Choose tool" },
+            function(item)
+                tools[item](gradient_big[idx])
+                idx = 1
+            end
+        )
+    end
+
     local format_strings = {
         ["hex"] = function()
             return gradient_big[idx]
@@ -123,6 +171,12 @@ return function(color, color_2)
         noremap = true,
     })
     vim.keymap.set("n", "q", "<cmd>q<CR>", {
+        buffer = buf,
+        noremap = true,
+    })
+    vim.keymap.set("n", "E", function()
+        export()
+    end, {
         buffer = buf,
         noremap = true,
     })
