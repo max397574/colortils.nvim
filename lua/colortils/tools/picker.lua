@@ -79,9 +79,7 @@ local format_strings = {
             )
             return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%, " .. a .. ")"
         else
-            local h, s, l = unpack(
-                color_utils.rgb_to_hsl(red, green, blue, transparency / 100)
-            )
+            local h, s, l = unpack(color_utils.rgb_to_hsl(red, green, blue))
             return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%)"
         end
     end,
