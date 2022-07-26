@@ -186,6 +186,37 @@ local function confirm()
     transparency = nil
 end
 
+--- Replace color under cursor with default format
+local function replace()
+    vim.api.nvim_win_close(win, true)
+    vim.api.nvim_buf_delete(buf, {})
+    buf = nil
+    win = nil
+    transparency = nil
+    color_utils.replace_under_cursor(
+        format_strings[colortils.settings.default_format]()
+    )
+end
+
+--- Replace color under cursor with choosen format
+local function replace_select()
+    vim.api.nvim_win_close(win, true)
+    vim.api.nvim_buf_delete(buf, {})
+    buf = nil
+    win = nil
+    vim.ui.select({
+        "hex: " .. format_strings["hex"](),
+        "rgb: " .. format_strings["rgb"](),
+        "hsl: " .. format_strings["hsl"](),
+    }, {
+        prompt = "Choose format",
+    }, function(item)
+        item = item:sub(1, 3)
+        transparency = nil
+        color_utils.replace_under_cursor(format_strings[item]())
+    end)
+end
+
 local value = nil
 
 --- Sets a color value to a certain value
@@ -315,6 +346,16 @@ local function create_mappings()
     })
     vim.keymap.set("n", "g<cr>", function()
         confirm_select()
+    end, {
+        buffer = buf,
+    })
+    vim.keymap.set("n", "<m-cr>", function()
+        replace()
+    end, {
+        buffer = buf,
+    })
+    vim.keymap.set("n", "g<m-cr>", function()
+        replace_select()
     end, {
         buffer = buf,
     })
