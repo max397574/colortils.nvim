@@ -1,6 +1,7 @@
 local utils_color = {}
 
 local utils = require("colortils.utils")
+local log = require("colortils.log")
 
 --- Gets the values of a hex color
 ---@param color string "#xxxxxx"
@@ -191,13 +192,12 @@ end
 ---@param h number
 ---@param s number
 ---@param l number
----@param a float
+---@param a number alpha (1-100)
 ---@return table
 function utils_color.hsl_to_rgb(h, s, l, a)
     h = h / 360
     s = s / 100
     l = l / 100
-    a = a and a / 100 or l
     local r, g, b
 
     -- achromatic
@@ -223,7 +223,7 @@ end
 
 --- Gets red, green and blue values for color
 ---@param color string @#RRGGBB
----@return string,string,string
+---@return string[]
 function utils_color.get_color_values(color)
     local red = tonumber(color:sub(2, 3), 16)
     local green = tonumber(color:sub(4, 5), 16)
