@@ -123,8 +123,9 @@ return function(color, color_2)
             { "Picker", "Gradient", "Greyscale", "Lighten", "Darken" },
             { prompt = "Choose tool" },
             function(item)
-                tools[item](gradient_big[idx])
+                local tmp_idx = idx
                 idx = 1
+                tools[item](gradient_big[tmp_idx])
             end
         )
     end
