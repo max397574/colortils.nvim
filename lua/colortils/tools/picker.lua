@@ -22,11 +22,7 @@ local function update_highlight()
         vim.api.nvim_set_hl(0, "ColorPickerPreview", {
             fg = color_utils.blend_colors(
                 "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue),
-                "#"
-                    .. string.format(
-                        "%x",
-                        vim.api.nvim_get_hl_by_name("Normal", true).background
-                    ),
+                "#" .. string.format("%x", vim.api.nvim_get_hl_by_name("Normal", true).background),
                 (100 - transparency) / 100
             ),
         })
@@ -74,9 +70,7 @@ local format_strings = {
     end,
     ["hsl"] = function()
         if transparency then
-            local h, s, l, a = unpack(
-                color_utils.rgb_to_hsl(red, green, blue, transparency / 100)
-            )
+            local h, s, l, a = unpack(color_utils.rgb_to_hsl(red, green, blue, transparency / 100))
             return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%, " .. a .. ")"
         else
             local h, s, l = unpack(color_utils.rgb_to_hsl(red, green, blue))
@@ -179,10 +173,7 @@ local function confirm()
     vim.api.nvim_buf_delete(buf, {})
     buf = nil
     win = nil
-    vim.fn.setreg(
-        colortils.settings.register,
-        format_strings[colortils.settings.default_format]()
-    )
+    vim.fn.setreg(colortils.settings.register, format_strings[colortils.settings.default_format]())
     transparency = nil
 end
 
@@ -193,9 +184,7 @@ local function replace()
     buf = nil
     win = nil
     transparency = nil
-    color_utils.replace_under_cursor(
-        format_strings[colortils.settings.default_format]()
-    )
+    color_utils.replace_under_cursor(format_strings[colortils.settings.default_format]())
 end
 
 --- Replace color under cursor with choosen format
@@ -294,10 +283,7 @@ local function export()
         { "Picker", "Gradient", "Greyscale", "Lighten", "Darken" },
         { prompt = "Choose tool" },
         function(item)
-            local hex_color = "#"
-                .. utils.hex(red)
-                .. utils.hex(green)
-                .. utils.hex(blue)
+            local hex_color = "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
             tools[item](hex_color)
         end
     )
@@ -412,20 +398,14 @@ return function(color)
             local cursor = vim.api.nvim_win_get_cursor(win)
             local row = old_cursor_pos[1]
             local bigger = false
-            if
-                cursor[1] > old_cursor_pos[1]
-                or cursor[2] > old_cursor_pos[2]
-            then
+            if cursor[1] > old_cursor_pos[1] or cursor[2] > old_cursor_pos[2] then
                 bigger = true
                 if transparency then
                     row = math.min((old_cursor_pos[1] + 1), 6)
                 else
                     row = math.min((old_cursor_pos[1] + 1), 3)
                 end
-            elseif
-                cursor[1] < old_cursor_pos[1]
-                or cursor[2] < old_cursor_pos[2]
-            then
+            elseif cursor[1] < old_cursor_pos[1] or cursor[2] < old_cursor_pos[2] then
                 row = math.max(old_cursor_pos[1] - 1, 1)
             end
             if vim.tbl_contains({ 4, 5 }, row) then

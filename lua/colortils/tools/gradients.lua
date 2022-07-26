@@ -64,11 +64,7 @@ return function(color, color_2)
         end,
     })
 
-    local gradient_big = require("colortils.utils.colors").gradient_colors(
-        color,
-        color_2,
-        255
-    )
+    local gradient_big = require("colortils.utils.colors").gradient_colors(color, color_2, 255)
     local function update()
         vim.api.nvim_set_hl(0, "ColorPickerPreview", { fg = gradient_big[idx] })
         local line
@@ -194,10 +190,7 @@ return function(color, color_2)
         vim.api.nvim_buf_delete(buf, {})
         buf = nil
         win = nil
-        vim.fn.setreg(
-            settings.register,
-            format_strings[settings.default_format]()
-        )
+        vim.fn.setreg(settings.register, format_strings[settings.default_format]())
         idx = 1
     end, {
         buffer = buf,

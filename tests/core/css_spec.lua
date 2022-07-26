@@ -1,28 +1,16 @@
 ---@diagnostic disable: undefined-global
 describe("Test css module", function()
     it("Get a color value", function()
-        assert.equals(
-            require("colortils.css").get_color_value("tomato"),
-            "#FF6347"
-        )
+        assert.equals(require("colortils.css").get_color_value("tomato"), "#FF6347")
     end)
     it("Get an invalid color value", function()
-        assert.equals(
-            require("colortils.css").get_color_value("amazing_color"),
-            nil
-        )
+        assert.equals(require("colortils.css").get_color_value("amazing_color"), nil)
     end)
     it("Get a color table", function()
-        assert.same(
-            require("colortils.css").get_color_table("tomato"),
-            { "tomato", "#FF6347" }
-        )
+        assert.same(require("colortils.css").get_color_table("tomato"), { "tomato", "#FF6347" })
     end)
     it("Get an invalid color table", function()
-        assert.equals(
-            require("colortils.css").get_color_table("amazing_color"),
-            nil
-        )
+        assert.equals(require("colortils.css").get_color_table("amazing_color"), nil)
     end)
     it("Get formatted colors", function()
         assert.same(require("colortils.css").get_formated_colors(), {

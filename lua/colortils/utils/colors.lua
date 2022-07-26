@@ -23,9 +23,7 @@ function utils_color.gradient_colors(start_color, end_color, total_length)
     if points < 0 then
         points = 0
     end
-    local start_red, start_green, start_blue = utils_color.get_values(
-        start_color
-    )
+    local start_red, start_green, start_blue = utils_color.get_values(start_color)
     if not start_red then
         return
     end
@@ -37,9 +35,7 @@ function utils_color.gradient_colors(start_color, end_color, total_length)
     local green_step = (end_green - start_green) / (points + 1)
     local blue_step = (end_blue - start_blue) / (points + 1)
     local gradient_colors = {
-        "#" .. utils.hex(start_red) .. utils.hex(start_green) .. utils.hex(
-            start_blue
-        ),
+        "#" .. utils.hex(start_red) .. utils.hex(start_green) .. utils.hex(start_blue),
     }
     for i = 1, points do
         gradient_colors[#gradient_colors + 1] = "#"
@@ -65,18 +61,8 @@ utils_color.display_gradient =
     ---@param width number
     function(buf, ns, line, start_color, end_color, width)
         width = width * 2
-        local gradient = utils_color.gradient_colors(
-            start_color,
-            end_color,
-            width
-        )
-        vim.api.nvim_buf_set_lines(
-            buf,
-            line,
-            line,
-            false,
-            { string.rep("▌", width / 2) }
-        )
+        local gradient = utils_color.gradient_colors(start_color, end_color, width)
+        vim.api.nvim_buf_set_lines(buf, line, line, false, { string.rep("▌", width / 2) })
         for i = 1, width do
             vim.api.nvim_set_hl(
                 0,
@@ -138,10 +124,7 @@ function utils_color.rgb_to_hsl(r, g, b, a)
 
     local chroma = c_max - c_min
     if chroma > 0 then
-        s = math.min(
-            (l <= 0.5 and chroma / (2 * l) or chroma / (2 - (2 * l))),
-            1
-        )
+        s = math.min((l <= 0.5 and chroma / (2 * l) or chroma / (2 - (2 * l))), 1)
 
         if c_max == r then
             h = ((g - b) / chroma + (g < b and 6 or 0))
@@ -285,9 +268,7 @@ function utils_color.get_colors(color_string)
         {
             colors = function(match)
                 local values = {
-                    match:match(
-                        "rgba%((%d+)%s*,%s*(%d+)%s*,%s*(%d+)%s*,%s*(%d+%.?%d?)%s*%)"
-                    ),
+                    match:match("rgba%((%d+)%s*,%s*(%d+)%s*,%s*(%d+)%s*,%s*(%d+%.?%d?)%s*%)"),
                 }
                 return {
                     tonumber(values[1]),
@@ -303,9 +284,7 @@ function utils_color.get_colors(color_string)
         {
             colors = function(match)
                 local values = {
-                    match:match(
-                        "rgb%(%s*(%d+)%%%s*,%s*(%d+)%%%s*,%s*(%d+)%%%s*%)"
-                    ),
+                    match:match("rgb%(%s*(%d+)%%%s*,%s*(%d+)%%%s*,%s*(%d+)%%%s*%)"),
                 }
                 return {
                     tonumber(values[1]) / 100 * 255,
@@ -320,9 +299,7 @@ function utils_color.get_colors(color_string)
         {
             colors = function(match)
                 local values = {
-                    match:match(
-                        "rgba%((%d+)%%%s*,%s*(%d+)%%%s*,%s*(%d+)%%%s*,%s*(%d+%.?%d?)%s*%)"
-                    ),
+                    match:match("rgba%((%d+)%%%s*,%s*(%d+)%%%s*,%s*(%d+)%%%s*,%s*(%d+%.?%d?)%s*%)"),
                 }
                 return {
                     tonumber(values[1]) / 100 * 255,
@@ -339,11 +316,7 @@ function utils_color.get_colors(color_string)
                 local values = {
                     match:match("hsl%((%d+)%s*,%s*(%d+)%%%s*,%s*(%d+)%%%s*%)"),
                 }
-                local rgb = utils_color.hsl_to_rgb(
-                    values[1],
-                    values[2],
-                    values[3]
-                )
+                local rgb = utils_color.hsl_to_rgb(values[1], values[2], values[3])
                 return { rgb[1], rgb[2], rgb[3] }
             end,
             transparency = false,
@@ -353,16 +326,9 @@ function utils_color.get_colors(color_string)
         {
             colors = function(match)
                 local values = {
-                    match:match(
-                        "hsla%((%d+)%s*,%s*(%d+)%%%s*,%s*(%d+)%%%s*,%s*(%d+%.?%d?)%s*%)"
-                    ),
+                    match:match("hsla%((%d+)%s*,%s*(%d+)%%%s*,%s*(%d+)%%%s*,%s*(%d+%.?%d?)%s*%)"),
                 }
-                local rgb = utils_color.hsl_to_rgb(
-                    values[1],
-                    values[2],
-                    values[3],
-                    values[4]
-                )
+                local rgb = utils_color.hsl_to_rgb(values[1], values[2], values[3], values[4])
                 return { rgb[1], rgb[2], rgb[3], rgb[4] }
             end,
             transparency = true,
@@ -375,10 +341,7 @@ function utils_color.get_colors(color_string)
     for _, color_format in ipairs(patterns) do
         local start = 1
         while true do
-            local start_pos, end_pos = color_string:find(
-                color_format.pattern,
-                start
-            )
+            local start_pos, end_pos = color_string:find(color_format.pattern, start)
             if start_pos == nil then
                 break
             end
@@ -402,9 +365,7 @@ function utils_color.replace_under_cursor(replacement, window)
     local buf = vim.fn.winbufnr(window)
     local cursor = vim.api.nvim_win_get_cursor(window)
     local pos = cursor[2] + 1
-    local colors = utils_color.get_colors(
-        vim.api.nvim_buf_get_lines(buf, 0, -1, false)[cursor[1]]
-    )
+    local colors = utils_color.get_colors(vim.api.nvim_buf_get_lines(buf, 0, -1, false)[cursor[1]])
     local color_table
     for _, color in ipairs(colors) do
         if pos >= color.start_pos and pos <= color.end_pos then
