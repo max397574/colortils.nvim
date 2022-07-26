@@ -245,4 +245,156 @@ function utils_color.blend_colors(top, bottom, alpha)
     return ("#%02X%02X%02X"):format(blend(1), blend(2), blend(3))
 end
 
+function utils_color.get_colors(color_string)
+    local patterns = {
+        {
+            colors = function(match)
+                return utils_color.get_color_values(match)
+            end,
+            transparency = false,
+            name = "hex",
+            pattern = "#%x%x%x%x%x%x",
+        },
+        {
+            colors = function(match)
+                local red = tonumber(match:sub(2, 3), 16)
+                local green = tonumber(match:sub(4, 5), 16)
+                local blue = tonumber(match:sub(6, 7), 16)
+                local alpha = tonumber(match:sub(8, 9), 16)
+                return { red, green, blue, alpha }
+            end,
+            transparency = true,
+            name = "hex alpha",
+            pattern = "#%x%x%x%x%x%x%x%x",
+        },
+        {
+            colors = function(match)
+                local values = {
+                    match:match("rgb%(%s*(%d+)%s*,%s*(%d+)%s*,%s*(%d+)%s*%)"),
+                }
+                return {
+                    tonumber(values[1]),
+                    tonumber(values[2]),
+                    tonumber(values[3]),
+                }
+            end,
+            transparency = false,
+            name = "rgb",
+            pattern = "rgb%(%s*%d+%s*,%s*%d+%s*,%s*%d+%s*%)",
+        },
+        {
+            colors = function(match)
+                local values = {
+                    match:match(
+                        "rgba%((%d+)%s*,%s*(%d+)%s*,%s*(%d+)%s*,%s*(%d+%.?%d?)%s*%)"
+                    ),
+                }
+                return {
+                    tonumber(values[1]),
+                    tonumber(values[2]),
+                    tonumber(values[3]),
+                    tonumber(values[4]),
+                }
+            end,
+            transparency = true,
+            name = "rgba",
+            pattern = "rgba%(%d+%s*,%s*%d+%s*,%s*%d+%s*,%s*%d+%.?%d*%s*%)",
+        },
+        {
+            colors = function(match)
+                local values = {
+                    match:match(
+                        "rgb%(%s*(%d+)%%%s*,%s*(%d+)%%%s*,%s*(%d+)%%%s*%)"
+                    ),
+                }
+                return {
+                    tonumber(values[1]) / 100 * 255,
+                    tonumber(values[2]) / 100 * 255,
+                    tonumber(values[3]) / 100 * 255,
+                }
+            end,
+            transparency = false,
+            name = "rgb percentage",
+            pattern = "rgb%(%d+%%%s*,%s*%d+%%%s*,%s*%d+%%%s*%)",
+        },
+        {
+            colors = function(match)
+                local values = {
+                    match:match(
+                        "rgba%((%d+)%%%s*,%s*(%d+)%%%s*,%s*(%d+)%%%s*,%s*(%d+%.?%d?)%s*%)"
+                    ),
+                }
+                return {
+                    tonumber(values[1]) / 100 * 255,
+                    tonumber(values[2]) / 100 * 255,
+                    tonumber(values[3]) / 100 * 255,
+                }
+            end,
+            transparency = true,
+            name = "rgba percentage",
+            pattern = "rgba%(%d+%%%s*,%s*%d+%%%s*,%s*%d+%%%s*,%s*%d+%.?%d*%s*%)",
+        },
+        {
+            colors = function(match)
+                local values = {
+                    match:match("hsl%((%d+)%s*,%s*(%d+)%%%s*,%s*(%d+)%%%s*%)"),
+                }
+                local rgb = utils_color.hsl_to_rgb(
+                    values[1],
+                    values[2],
+                    values[3]
+                )
+                return { rgb[1], rgb[2], rgb[3] }
+            end,
+            transparency = false,
+            name = "hsl",
+            pattern = "hsl%(%d+%s*,%s*%d+%%%s*,%s*%d+%%%s*%)",
+        },
+        {
+            colors = function(match)
+                local values = {
+                    match:match(
+                        "hsla%((%d+)%s*,%s*(%d+)%%%s*,%s*(%d+)%%%s*,%s*(%d+%.?%d?)%s*%)"
+                    ),
+                }
+                local rgb = utils_color.hsl_to_rgb(
+                    values[1],
+                    values[2],
+                    values[3],
+                    values[4]
+                )
+                return { rgb[1], rgb[2], rgb[3], rgb[4] }
+            end,
+            transparency = true,
+            name = "hsla",
+            pattern = "hsla%(%d+%s*,%s*%d+%%%s*,%s*%d+%%%s*,%s*%d+%.?%d*%s*%)",
+        },
+    }
+    local colors = {}
+    local match
+    for _, color_format in ipairs(patterns) do
+        local start = 1
+        while true do
+            local start_pos, end_pos = color_string:find(
+                color_format.pattern,
+                start
+            )
+            if start_pos == nil then
+                break
+            end
+            match = color_string:match(color_format.pattern)
+            table.insert(colors, {
+                start_pos = start_pos,
+                end_pos = end_pos,
+                match = match,
+                rgb_values = color_format.colors(match),
+                type = color_format.name,
+                transparency = color_format.transparency,
+            })
+            start = end_pos + 1
+        end
+    end
+    return colors
+end
+
 return utils_color
