@@ -43,6 +43,7 @@ return function(color, color_2)
     buf = vim.api.nvim_create_buf(false, true)
     local win = vim.api.nvim_open_win(buf, true, {
         relative = "editor",
+        zindex = 90,
         width = 51,
         col = 10,
         row = 5,
@@ -262,6 +263,36 @@ return function(color, color_2)
     vim.keymap.set("n", "0", function()
         idx = 1
         update()
+    end, {
+        buffer = buf,
+    })
+    local help_is_open = false
+    local help_window
+    vim.keymap.set("n", "?", function()
+        if help_is_open then
+            vim.api.nvim_win_close(help_window, true)
+            help_is_open = false
+            return
+        end
+        help_is_open = true
+        local help_buf = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_buf_set_option(help_buf, "bufhidden", "wipe")
+        local lines = {
+            "A small window for testing",
+            "With some text",
+        }
+        vim.api.nvim_buf_set_lines(help_buf, 0, -1, false, lines)
+        help_window = vim.api.nvim_open_win(help_buf, false, {
+            relative = "editor",
+            col = 31,
+            row = 5,
+            zindex = 100,
+            width = 30,
+            height = 5,
+            border = "rounded",
+            style = "minimal",
+        })
+        vim.api.nvim_buf_set_option(help_buf, "modifiable", false)
     end, {
         buffer = buf,
     })
