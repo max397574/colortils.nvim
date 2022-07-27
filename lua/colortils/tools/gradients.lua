@@ -148,11 +148,11 @@ return function(color, color_2)
         ["rgb"] = function()
             local picked_color = gradient_big[idx]
             return "rgb("
-                .. picked_color:sub(2, 3)
+                .. tonumber(picked_color:sub(2, 3), 16)
                 .. ", "
-                .. picked_color:sub(4, 5)
+                .. tonumber(picked_color:sub(4, 5), 16)
                 .. ", "
-                .. picked_color:sub(6, 7)
+                .. tonumber(picked_color:sub(6, 7), 16)
                 .. ")"
         end,
         ["hsl"] = function()
