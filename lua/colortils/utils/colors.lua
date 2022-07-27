@@ -314,19 +314,21 @@ function utils_color.get_colors(color_string)
         {
             colors = function(match)
                 local values = {
-                    match:match("hsl%((%d+)%s*,%s*(%d+)%%%s*,%s*(%d+)%%%s*%)"),
+                    match:match("hsl%((%d+%.?%d?)%s*,%s*(%d+%.?%d?)%%%s*,%s*(%d+%.?%d?)%%%s*%)"),
                 }
                 local rgb = utils_color.hsl_to_rgb(values[1], values[2], values[3])
                 return { rgb[1], rgb[2], rgb[3] }
             end,
             transparency = false,
             name = "hsl",
-            pattern = "hsl%(%d+%s*,%s*%d+%%%s*,%s*%d+%%%s*%)",
+            pattern = "hsl%(%d+%.?%d?%s*,%s*%d+%.?%d?%%%s*,%s*%d+%.?%d?%%%s*%)",
         },
         {
             colors = function(match)
                 local values = {
-                    match:match("hsla%((%d+)%s*,%s*(%d+)%%%s*,%s*(%d+)%%%s*,%s*(%d+%.?%d?)%s*%)"),
+                    match:match(
+                        "hsla%((%d+%.?%d?)%s*,%s*(%d+%.?%d?)%%%s*,%s*(%d+%.?%d?)%%%s*,%s*(%d+%.?%d?)%s*%)"
+                    ),
                 }
                 local rgb = utils_color.hsl_to_rgb(values[1], values[2], values[3], values[4])
                 return { rgb[1], rgb[2], rgb[3], rgb[4] }
