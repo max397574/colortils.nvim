@@ -303,6 +303,8 @@ return function(color, color_2)
                 .. colortils.settings.mappings.increment_big,
             "Decrement big:                                 "
                 .. colortils.settings.mappings.decrement_big,
+            "Select first color:                            " .. "0",
+            "Select last color:                             " .. "$",
             "Save to register   `"
                 .. colortils.settings.register
                 .. "` with format "
@@ -326,7 +328,7 @@ return function(color, color_2)
             row = 5,
             zindex = 100,
             width = 60,
-            height = 10,
+            height = 11,
             border = "rounded",
             style = "minimal",
         })
