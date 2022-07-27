@@ -3,6 +3,7 @@ local settings = require("colortils").settings
 local idx = 1
 local buf
 local ns = vim.api.nvim_create_namespace("colortils_gradient")
+local help_ns = vim.api.nvim_create_namespace("colortils_gradient_help")
 local old_cursor = vim.opt.guicursor
 local colortils = require("colortils")
 
@@ -155,6 +156,17 @@ return function(color, color_2)
         end,
     }
 
+    local help_is_open = false
+    local help_window
+    local function close()
+        vim.cmd([[q]])
+        if help_is_open then
+            vim.api.nvim_win_close(help_window, true)
+            help_is_open = false
+            return
+        end
+    end
+
     vim.keymap.set("n", "l", function()
         increase()
         update()
@@ -169,7 +181,9 @@ return function(color, color_2)
         buffer = buf,
         noremap = true,
     })
-    vim.keymap.set("n", "q", "<cmd>q<CR>", {
+    vim.keymap.set("n", "q", function()
+        close()
+    end, {
         buffer = buf,
         noremap = true,
     })
@@ -266,8 +280,6 @@ return function(color, color_2)
     end, {
         buffer = buf,
     })
-    local help_is_open = false
-    local help_window
     vim.keymap.set("n", "?", function()
         if help_is_open then
             vim.api.nvim_win_close(help_window, true)
@@ -278,19 +290,52 @@ return function(color, color_2)
         local help_buf = vim.api.nvim_create_buf(false, true)
         vim.api.nvim_buf_set_option(help_buf, "bufhidden", "wipe")
         local lines = {
-            "A small window for testing",
-            "With some text",
+            "Keybindings",
+            "Increment:                                     " .. "l",
+            "Decrement:                                     " .. "h",
+            "Increment big:                                 "
+                .. colortils.settings.mappings.increment_big,
+            "Decrement big:                                 "
+                .. colortils.settings.mappings.decrement_big,
+            "Save to register   `"
+                .. colortils.settings.register
+                .. "` with format "
+                .. colortils.settings.default_format
+                .. ":        "
+                .. "<cr>",
+            "Choose format and save to register `"
+                .. colortils.settings.register
+                .. "`:        "
+                .. "g<cr>",
+            "Replace color under cursor with format "
+                .. colortils.settings.default_format
+                .. ":    "
+                .. "<m-cr>",
+            "Choose format and replace color under cursor:  " .. "g<m-cr>",
         }
         vim.api.nvim_buf_set_lines(help_buf, 0, -1, false, lines)
         help_window = vim.api.nvim_open_win(help_buf, false, {
             relative = "editor",
-            col = 31,
+            col = 63,
             row = 5,
             zindex = 100,
-            width = 30,
-            height = 5,
+            width = 60,
+            height = 10,
             border = "rounded",
             style = "minimal",
+        })
+        vim.api.nvim_buf_add_highlight(help_buf, help_ns, "Special", 0, 0, -1)
+        for i = 1, 10, 1 do
+            vim.api.nvim_buf_add_highlight(help_buf, help_ns, "String", i, 0, 47)
+            vim.api.nvim_buf_add_highlight(help_buf, help_ns, "Keyword", i, 47, -1)
+        end
+        vim.api.nvim_create_autocmd("WinClosed", {
+            pattern = tostring(help_window),
+            callback = function()
+                help_is_open = false
+                help_window = nil
+                help_buf = nil
+            end,
         })
         vim.api.nvim_buf_set_option(help_buf, "modifiable", false)
     end, {
