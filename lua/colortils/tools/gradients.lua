@@ -347,12 +347,12 @@ return function(color, color_2)
             row = 5,
             zindex = 100,
             width = 60,
-            height = 11,
+            height = 12,
             border = "rounded",
             style = "minimal",
         })
         vim.api.nvim_buf_add_highlight(help_buf, help_ns, "Special", 0, 0, -1)
-        for i = 1, 10, 1 do
+        for i = 1, 11, 1 do
             vim.api.nvim_buf_add_highlight(help_buf, help_ns, "String", i, 0, 47)
             vim.api.nvim_buf_add_highlight(help_buf, help_ns, "Keyword", i, 47, -1)
         end
