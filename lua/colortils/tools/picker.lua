@@ -471,6 +471,7 @@ local function create_mappings()
 end
 
 return function(color)
+    old_cursor_pos = { 0, 1 }
     red, green, blue = color_utils.get_values(color)
     buf = vim.api.nvim_create_buf(false, true)
     create_mappings()
