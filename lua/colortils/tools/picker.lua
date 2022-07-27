@@ -402,6 +402,7 @@ local function create_mappings()
             "Set value to max:                              " .. "$",
             "Select next value:                             " .. "j",
             "Select previous value:                         " .. "k",
+            "Export to other tool:                          " .. "E",
             "Save to register   `"
                 .. colortils.settings.register
                 .. "` with format "

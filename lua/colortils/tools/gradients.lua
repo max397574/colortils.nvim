@@ -304,6 +304,7 @@ return function(color, color_2)
                 .. colortils.settings.mappings.decrement_big,
             "Select first color:                            " .. "0",
             "Select last color:                             " .. "$",
+            "Export to other tool:                          " .. "E",
             "Save to register   `"
                 .. colortils.settings.register
                 .. "` with format "
