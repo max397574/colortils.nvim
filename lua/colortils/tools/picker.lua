@@ -308,17 +308,17 @@ local function create_mappings()
     end, {
         buffer = buf,
     })
-    vim.keymap.set("n", "c", function()
+    vim.keymap.set("n", colortils.settings.mappings.set_value, function()
         set_value()
     end, {
         buffer = buf,
     })
-    vim.keymap.set("n", "l", function()
+    vim.keymap.set("n", colortils.settings.mappings.increment, function()
         adjust_color(1)
     end, {
         buffer = buf,
     })
-    vim.keymap.set("n", "h", function()
+    vim.keymap.set("n", colortils.settings.mappings.decrement, function()
         adjust_color(-1)
     end, {
         buffer = buf,
@@ -333,37 +333,37 @@ local function create_mappings()
     end, {
         buffer = buf,
     })
-    vim.keymap.set("n", "<cr>", function()
+    vim.keymap.set("n", colortils.settings.mappings.set_register_default_format, function()
         confirm()
     end, {
         buffer = buf,
     })
-    vim.keymap.set("n", "g<cr>", function()
+    vim.keymap.set("n", colortils.settings.mappings.set_register_choose_format, function()
         confirm_select()
     end, {
         buffer = buf,
     })
-    vim.keymap.set("n", "<m-cr>", function()
+    vim.keymap.set("n", colortils.settings.mappings.replace_default_format, function()
         replace()
     end, {
         buffer = buf,
     })
-    vim.keymap.set("n", "g<m-cr>", function()
+    vim.keymap.set("n", colortils.settings.mappings.replace_choose_format, function()
         replace_select()
     end, {
         buffer = buf,
     })
-    vim.keymap.set("n", "$", function()
+    vim.keymap.set("n", colortils.settings.mappings.max_value, function()
         set_color_value(255)
     end, {
         buffer = buf,
     })
-    vim.keymap.set("n", "0", function()
+    vim.keymap.set("n", colortils.settings.mappings.min_value, function()
         set_color_value(0)
     end, {
         buffer = buf,
     })
-    vim.keymap.set("n", "T", function()
+    vim.keymap.set("n", colortils.settings.mappings.transparency, function()
         if not transparency then
             vim.api.nvim_win_set_height(win, 6)
             transparency = 0
@@ -378,9 +378,11 @@ local function create_mappings()
     end, {
         buffer = buf,
     })
-    vim.keymap.set("n", "E", function()
+    vim.keymap.set("n", colortils.settings.mappings.export, function()
         export()
-    end, { buffer = buf })
+    end, {
+        buffer = buf,
+    })
     vim.keymap.set("n", "?", function()
         if help_is_open then
             vim.api.nvim_win_close(help_window, true)
@@ -398,26 +400,31 @@ local function create_mappings()
                 .. colortils.settings.mappings.increment_big,
             "Decrement big:                                 "
                 .. colortils.settings.mappings.decrement_big,
-            "Set value to min:                              " .. "0",
-            "Set value to max:                              " .. "$",
+            "Set value to min:                              "
+                .. colortils.settings.mappings.min_value,
+            "Set value to max:                              "
+                .. colortils.settings.mappings.max_value,
             "Select next value:                             " .. "j",
             "Select previous value:                         " .. "k",
-            "Export to other tool:                          " .. "E",
+            "Export to other tool:                          " .. colortils.settings.mappings.export,
+            "Toggle transparency:                           "
+                .. colortils.settings.mappings.transparency,
             "Save to register   `"
                 .. colortils.settings.register
                 .. "` with format "
                 .. colortils.settings.default_format
                 .. ":        "
-                .. "<cr>",
+                .. colortils.settings.mappings.set_register_default_format,
             "Choose format and save to register `"
                 .. colortils.settings.register
                 .. "`:        "
-                .. "g<cr>",
+                .. colortils.settings.mappings.set_register_choose_format,
             "Replace color under cursor with format "
                 .. colortils.settings.default_format
                 .. ":    "
-                .. "<m-cr>",
-            "Choose format and replace color under cursor:  " .. "g<m-cr>",
+                .. colortils.settings.mappings.replace_default_format,
+            "Choose format and replace color under cursor:  "
+                .. colortils.settings.mappings.replace_choose_format,
         }
         vim.api.nvim_buf_set_lines(help_buf, 0, -1, false, lines)
         help_window = vim.api.nvim_open_win(help_buf, false, {
@@ -426,12 +433,12 @@ local function create_mappings()
             row = -1,
             zindex = 100,
             width = 60,
-            height = 13,
+            height = 15,
             border = "rounded",
             style = "minimal",
         })
         vim.api.nvim_buf_add_highlight(help_buf, help_ns, "Special", 0, 0, -1)
-        for i = 1, 13, 1 do
+        for i = 1, 14, 1 do
             vim.api.nvim_buf_add_highlight(help_buf, help_ns, "String", i, 0, 47)
             vim.api.nvim_buf_add_highlight(help_buf, help_ns, "Keyword", i, 47, -1)
         end
