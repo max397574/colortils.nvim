@@ -7,6 +7,7 @@ local help_ns = vim.api.nvim_create_namespace("colortils_gradient_help")
 local old_cursor = vim.opt.guicursor
 local colortils = require("colortils")
 local help_is_open = false
+local help_window
 
 --- Sets the marker which indeicates position on the gradient
 local function set_marker()
@@ -121,6 +122,10 @@ return function(color, color_2)
     }
 
     local function export()
+        if help_is_open then
+            vim.api.nvim_win_close(help_window, true)
+            help_is_open = false
+        end
         vim.api.nvim_win_close(win, true)
         vim.api.nvim_buf_delete(buf, {})
         buf = nil
@@ -163,7 +168,6 @@ return function(color, color_2)
         end,
     }
 
-    local help_window
     local function close()
         if help_is_open then
             vim.api.nvim_win_close(help_window, true)
@@ -218,6 +222,11 @@ return function(color, color_2)
         noremap = true,
     })
     vim.keymap.set("n", colortils.settings.mappings.set_register_choose_format, function()
+        if help_is_open then
+            vim.api.nvim_win_close(help_window, true)
+            help_is_open = false
+        end
+
         vim.api.nvim_win_close(win, true)
         vim.api.nvim_buf_delete(buf, {})
         buf = nil
