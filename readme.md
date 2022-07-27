@@ -18,6 +18,8 @@
 - Lighten and darken colors
 - Convert colors to greyscale or something between the color and it's grey version
 - Pick a color on a gradient between two colors
+- Export from any of the mentioned tools above to other ones
+- Replace color under cursor
 - Some utilities for css colors
     - List Colors
 
@@ -42,7 +44,10 @@ You can provide an optional argument which is the intial color the picker will h
 This is a hex color code without the `#` at the beginning (e.g. FF00AB).
 
 You can use `h`/`l` to change the color value under the cursor.
-With `<cr>` you can yank the hex color code into the register specified in settings (see defaults below).
+With `<cr>` you can yank the color in with the default format into the register specified in settings (see defaults below).
+You can use `g<cr>` to get a prompt in which you can choose the format.
+
+With `<m-cr>`/`g<m-cr>` you can replace the color under the cursor instead of copying into a register.
 
 #### Css Utilities
 ##### List colors

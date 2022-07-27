@@ -64,10 +64,7 @@ function utils.get_bar(value, max_value, max_width)
     local block_value = max_value / max_width
     -- get amount of full blocks
     local bar = string.rep("█", math.floor(value / block_value))
-    return bar
-        .. utils.get_partial_block(
-            value / block_value - math.floor(value / block_value)
-        )
+    return bar .. utils.get_partial_block(value / block_value - math.floor(value / block_value))
 end
 
 --- Checks if is valid color
@@ -100,12 +97,7 @@ function utils.validate_settings(settings)
             function(reg)
                 if reg:gmatch("%w") then
                     return true
-                elseif
-                    vim.tbl_contains(
-                        { "-", "#", "=", "+", "_", " ", "/", "" },
-                        reg
-                    )
-                then
+                elseif vim.tbl_contains({ "-", "#", "=", "+", "_", " ", "/", "" }, reg) then
                     return true
                 else
                     return false
@@ -129,10 +121,7 @@ function utils.validate_settings(settings)
                 then
                     return true
                 end
-                if
-                    type(bord) == "table"
-                    and vim.tbl_contains({ 1, 2, 4, 8 }, #bord)
-                then
+                if type(bord) == "table" and vim.tbl_contains({ 1, 2, 4, 8 }, #bord) then
                     return true
                 end
             end,

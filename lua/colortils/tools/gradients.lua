@@ -4,6 +4,7 @@ local idx = 1
 local buf
 local ns = vim.api.nvim_create_namespace("colortils_gradient")
 local old_cursor = vim.opt.guicursor
+local colortils = require("colortils")
 
 --- Sets the marker which indeicates position on the gradient
 local function set_marker()
@@ -64,11 +65,7 @@ return function(color, color_2)
         end,
     })
 
-    local gradient_big = require("colortils.utils.colors").gradient_colors(
-        color,
-        color_2,
-        255
-    )
+    local gradient_big = require("colortils.utils.colors").gradient_colors(color, color_2, 255)
     local function update()
         vim.api.nvim_set_hl(0, "ColorPickerPreview", { fg = gradient_big[idx] })
         local line
@@ -123,8 +120,9 @@ return function(color, color_2)
             { "Picker", "Gradient", "Greyscale", "Lighten", "Darken" },
             { prompt = "Choose tool" },
             function(item)
-                tools[item](gradient_big[idx])
+                local tmp_idx = idx
                 idx = 1
+                tools[item](gradient_big[tmp_idx])
             end
         )
     end
@@ -193,10 +191,7 @@ return function(color, color_2)
         vim.api.nvim_buf_delete(buf, {})
         buf = nil
         win = nil
-        vim.fn.setreg(
-            settings.register,
-            format_strings[settings.default_format]()
-        )
+        vim.fn.setreg(settings.register, format_strings[settings.default_format]())
         idx = 1
     end, {
         buffer = buf,
@@ -216,6 +211,36 @@ return function(color, color_2)
         }, function(item)
             item = item:sub(1, 3)
             vim.fn.setreg(settings.register, format_strings[item]())
+            idx = 1
+        end)
+    end, {
+        buffer = buf,
+    })
+    vim.keymap.set("n", "<m-cr>", function()
+        vim.api.nvim_win_close(win, true)
+        vim.api.nvim_buf_delete(buf, {})
+        buf = nil
+        win = nil
+        color_utils.replace_under_cursor(format_strings[settings.default_format]())
+        idx = 1
+    end, {
+        buffer = buf,
+        noremap = true,
+    })
+    vim.keymap.set("n", "g<m-cr>", function()
+        vim.api.nvim_win_close(win, true)
+        vim.api.nvim_buf_delete(buf, {})
+        buf = nil
+        win = nil
+        vim.ui.select({
+            "hex: " .. format_strings["hex"](),
+            "rgb: " .. format_strings["rgb"](),
+            "hsl: " .. format_strings["hsl"](),
+        }, {
+            prompt = "Choose format",
+        }, function(item)
+            item = item:sub(1, 3)
+            color_utils.replace_under_cursor(format_strings[item]())
             idx = 1
         end)
     end, {

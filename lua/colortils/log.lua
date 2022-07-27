@@ -114,11 +114,7 @@ function log.new(config, standalone)
 
                 local split_console = vim.split(console_string, "\n")
                 for _, v in ipairs(split_console) do
-                    local formatted_msg = string.format(
-                        "[%s] %s",
-                        config.plugin,
-                        v
-                    ) -- vim.fn.escape(v, [["\]]))
+                    local formatted_msg = string.format("[%s] %s", config.plugin, v) -- vim.fn.escape(v, [["\]]))
 
                     local ok = pcall(
                         vim.notify,
@@ -140,13 +136,7 @@ function log.new(config, standalone)
         -- Output to log file
         if config.use_file then
             local fp = assert(io.open(outfile, "a"))
-            local str = string.format(
-                "[%-6s%s] %s: %s\n",
-                nameupper,
-                os.date(),
-                lineinfo,
-                msg
-            )
+            local str = string.format("[%-6s%s] %s: %s\n", nameupper, os.date(), lineinfo, msg)
             fp:write(str)
             fp:close()
         end
