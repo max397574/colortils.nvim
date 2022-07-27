@@ -360,8 +360,7 @@ function utils_color.get_colors(color_string)
     return colors
 end
 
-function utils_color.replace_under_cursor(replacement, window)
-    window = window or 0
+function utils_color.get_color_under_cursor(window)
     local buf = vim.fn.winbufnr(window)
     local cursor = vim.api.nvim_win_get_cursor(window)
     local pos = cursor[2] + 1
@@ -373,6 +372,13 @@ function utils_color.replace_under_cursor(replacement, window)
             break
         end
     end
+    return color_table or nil
+end
+
+function utils_color.replace_under_cursor(replacement, window)
+    window = window or 0
+    local cursor = vim.api.nvim_win_get_cursor(window)
+    local color_table = utils_color.get_color_under_cursor(window)
     if not color_table then
         log.warn("No color found under cursor")
         return
