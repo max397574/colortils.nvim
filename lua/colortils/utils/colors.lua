@@ -345,7 +345,7 @@ function utils_color.get_colors(color_string)
             if start_pos == nil then
                 break
             end
-            match = color_string:match(color_format.pattern)
+            match = color_string:match(color_format.pattern, start)
             table.insert(colors, {
                 start_pos = start_pos,
                 end_pos = end_pos,
