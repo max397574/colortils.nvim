@@ -165,12 +165,11 @@ return function(color, color_2)
 
     local help_window
     local function close()
-        vim.cmd([[q]])
         if help_is_open then
             vim.api.nvim_win_close(help_window, true)
             help_is_open = false
-            return
         end
+        vim.cmd([[q]])
     end
 
     vim.keymap.set("n", "l", function()
