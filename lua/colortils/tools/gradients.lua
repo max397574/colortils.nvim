@@ -257,6 +257,11 @@ return function(color, color_2)
         noremap = true,
     })
     vim.keymap.set("n", colortils.settings.mappings.replace_choose_format, function()
+        if help_is_open then
+            vim.api.nvim_win_close(help_window, true)
+            help_is_open = false
+        end
+
         vim.api.nvim_win_close(win, true)
         vim.api.nvim_buf_delete(buf, {})
         buf = nil

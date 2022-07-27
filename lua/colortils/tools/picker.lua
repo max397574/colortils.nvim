@@ -11,6 +11,8 @@ local help_ns = vim.api.nvim_create_namespace("colortils_picker_help")
 local old_cursor = vim.opt.guicursor
 local old_cursor_pos = { 0, 1 }
 local transparency = nil
+local help_is_open = false
+local help_window
 
 --- Updates the highlight used for the preview
 local function update_highlight()
@@ -151,6 +153,11 @@ end
 
 --- Confirm color and choose format
 local function confirm_select()
+    if help_is_open then
+        vim.api.nvim_win_close(help_window, true)
+        help_is_open = false
+    end
+
     vim.api.nvim_win_close(win, true)
     vim.api.nvim_buf_delete(buf, {})
     buf = nil
@@ -190,6 +197,11 @@ end
 
 --- Replace color under cursor with choosen format
 local function replace_select()
+    if help_is_open then
+        vim.api.nvim_win_close(help_window, true)
+        help_is_open = false
+    end
+
     vim.api.nvim_win_close(win, true)
     vim.api.nvim_buf_delete(buf, {})
     buf = nil
@@ -275,6 +287,11 @@ local tools = {
 }
 
 local function export()
+    if help_is_open then
+        vim.api.nvim_win_close(help_window, true)
+        help_is_open = false
+    end
+
     vim.api.nvim_win_close(win, true)
     vim.api.nvim_buf_delete(buf, {})
     buf = nil
@@ -290,11 +307,8 @@ local function export()
     )
 end
 
-local help_is_open = false
 --- Create the mappings for the picker buffer
 local function create_mappings()
-    local help_window
-
     vim.keymap.set("n", "q", function()
         if help_is_open then
             help_is_open = false
