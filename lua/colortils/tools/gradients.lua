@@ -6,6 +6,7 @@ local ns = vim.api.nvim_create_namespace("colortils_gradient")
 local help_ns = vim.api.nvim_create_namespace("colortils_gradient_help")
 local old_cursor = vim.opt.guicursor
 local colortils = require("colortils")
+local help_is_open = false
 
 --- Sets the marker which indeicates position on the gradient
 local function set_marker()
@@ -54,16 +55,22 @@ return function(color, color_2)
     })
     vim.api.nvim_win_set_option(win, "cursorline", false)
     color_utils.display_gradient(buf, ns, 0, color, color_2, 51)
-    vim.opt.guicursor = "a:ver1-Normal/Normal"
+    vim.opt_local.guicursor = "a:ver1-Normal/Normal"
     vim.api.nvim_create_autocmd("CursorMoved", {
         callback = function()
             vim.api.nvim_win_set_cursor(win, { 2, 1 })
         end,
         buffer = buf,
     })
-    vim.api.nvim_create_autocmd("BufLeave", {
+    vim.api.nvim_create_autocmd({
+        "BufEnter",
+    }, {
         callback = function()
-            vim.opt.guicursor = old_cursor
+            if buf and vim.api.nvim_get_current_buf() == buf or help_is_open then
+                vim.opt_local.guicursor = "a:ver1-Normal/Normal"
+            else
+                vim.opt.guicursor = old_cursor
+            end
         end,
     })
 
@@ -156,7 +163,6 @@ return function(color, color_2)
         end,
     }
 
-    local help_is_open = false
     local help_window
     local function close()
         vim.cmd([[q]])

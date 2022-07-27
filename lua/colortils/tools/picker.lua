@@ -289,9 +289,14 @@ local function export()
     )
 end
 
+local help_is_open = false
 --- Create the mappings for the picker buffer
 local function create_mappings()
     vim.keymap.set("n", "q", function()
+        if help_is_open then
+            help_is_open = false
+            vim.api.nvim_win_close(help_window, true)
+        end
         vim.api.nvim_win_close(win, true)
         vim.api.nvim_buf_delete(buf, {})
         buf = nil
@@ -392,7 +397,7 @@ return function(color)
     })
     vim.api.nvim_win_set_option(win, "cursorline", false)
     vim.api.nvim_set_hl(0, "ColortilsBlack", { fg = "#000000" })
-    vim.opt.guicursor = "a:ver1-Normal/Normal"
+    vim.opt_local.guicursor = "a:ver1-Normal/Normal"
     vim.api.nvim_create_autocmd("CursorMoved", {
         callback = function()
             local cursor = vim.api.nvim_win_get_cursor(win)
@@ -422,11 +427,18 @@ return function(color)
         end,
         buffer = buf,
     })
-    vim.api.nvim_create_autocmd("BufLeave", {
+    vim.api.nvim_create_autocmd({
+        "BufEnter",
+    }, {
         callback = function()
-            vim.opt.guicursor = old_cursor
+            if buf and vim.api.nvim_get_current_buf() == buf or help_is_open then
+                vim.opt_local.guicursor = "a:ver1-Normal/Normal"
+            else
+                vim.opt.guicursor = old_cursor
+            end
         end,
     })
+
     update_highlight()
     set_picker_lines()
     vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
