@@ -56,7 +56,13 @@ return function(color, color_2)
     })
     vim.api.nvim_win_set_option(win, "cursorline", false)
     color_utils.display_gradient(buf, ns, 0, color, color_2, 51)
-    vim.opt_local.guicursor = "a:ver1-Normal/Normal"
+    vim.opt_local.guicursor = "a:ver1-Cursor/Cursor"
+    local cursor_fg = vim.api.nvim_get_hl_by_name("Cursor", true).foreground
+    local cursor_bg = vim.api.nvim_get_hl_by_name("Cursor", true).background
+    vim.api.nvim_set_hl(0, "Cursor", {
+        fg = vim.api.nvim_get_hl_by_name("Normal", true).background,
+        bg = vim.api.nvim_get_hl_by_name("Normal", true).background,
+    })
     vim.api.nvim_create_autocmd("CursorMoved", {
         callback = function()
             vim.api.nvim_win_set_cursor(win, { 2, 1 })
@@ -68,9 +74,10 @@ return function(color, color_2)
     }, {
         callback = function()
             if buf and vim.api.nvim_get_current_buf() == buf or help_is_open then
-                vim.opt_local.guicursor = "a:ver1-Normal/Normal"
+                vim.opt_local.guicursor = "a:ver1-Cursor/Cursor"
             else
                 vim.opt.guicursor = old_cursor
+                vim.api.nvim_set_hl(0, "Cursor", { fg = cursor_fg, bg = cursor_bg })
             end
         end,
     })
