@@ -268,7 +268,7 @@ function utils_color.get_colors(color_string)
         {
             colors = function(match)
                 local values = {
-                    match:match("rgba%((%d+)%s*,%s*(%d+)%s*,%s*(%d+)%s*,%s*(%d+%.?%d?)%s*%)"),
+                    match:match("rgba%((%d+)%s*,%s*(%d+)%s*,%s*(%d+)%s*,%s*(%d+%.?%d*)%s*%)"),
                 }
                 return {
                     tonumber(values[1]),
