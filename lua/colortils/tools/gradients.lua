@@ -60,8 +60,8 @@ return function(color, color_2)
     local cursor_fg = vim.api.nvim_get_hl_by_name("Cursor", true).foreground
     local cursor_bg = vim.api.nvim_get_hl_by_name("Cursor", true).background
     vim.api.nvim_set_hl(0, "Cursor", {
-        fg = vim.api.nvim_get_hl_by_name("Normal", true).background,
-        bg = vim.api.nvim_get_hl_by_name("Normal", true).background,
+        fg = vim.api.nvim_get_hl_by_name("NormalFloat", true).background,
+        bg = vim.api.nvim_get_hl_by_name("NormalFloat", true).background,
     })
     vim.api.nvim_create_autocmd("CursorMoved", {
         callback = function()

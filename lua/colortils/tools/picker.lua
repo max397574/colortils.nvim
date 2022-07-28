@@ -25,7 +25,11 @@ local function update_highlight()
         vim.api.nvim_set_hl(0, "ColorPickerPreview", {
             fg = color_utils.blend_colors(
                 "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue),
-                "#" .. string.format("%x", vim.api.nvim_get_hl_by_name("Normal", true).background),
+                "#"
+                    .. string.format(
+                        "%x",
+                        vim.api.nvim_get_hl_by_name("NormalFloat", true).background
+                    ),
                 (100 - transparency) / 100
             ),
         })
@@ -492,8 +496,8 @@ return function(color)
     local cursor_fg = vim.api.nvim_get_hl_by_name("Cursor", true).foreground
     local cursor_bg = vim.api.nvim_get_hl_by_name("Cursor", true).background
     vim.api.nvim_set_hl(0, "Cursor", {
-        fg = vim.api.nvim_get_hl_by_name("Normal", true).background,
-        bg = vim.api.nvim_get_hl_by_name("Normal", true).background,
+        fg = vim.api.nvim_get_hl_by_name("NormalFloat", true).background,
+        bg = vim.api.nvim_get_hl_by_name("NormalFloat", true).background,
     })
     vim.api.nvim_create_autocmd("CursorMoved", {
         callback = function()
