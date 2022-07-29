@@ -155,7 +155,7 @@ function css.get_color_value(color)
             return color_table[2]
         end
     end
-    return nil
+    return ""
 end
 
 --- Gets the table for a color
@@ -167,7 +167,7 @@ function css.get_color_table(color)
             return color_table
         end
     end
-    return nil
+    return {}
 end
 
 --- Gets the colors formatted as a table of string
