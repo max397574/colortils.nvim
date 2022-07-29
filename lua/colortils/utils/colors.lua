@@ -362,9 +362,9 @@ function utils_color.get_colors(color_string)
     return colors
 end
 
-function utils_color.get_color_under_cursor(window)
-    local buf = vim.fn.winbufnr(window)
-    local cursor = vim.api.nvim_win_get_cursor(window)
+function utils_color.get_color_under_cursor(winnr)
+    local buf = vim.fn.winbufnr(winnr)
+    local cursor = vim.api.nvim_win_get_cursor(winnr)
     local pos = cursor[2] + 1
     local colors = utils_color.get_colors(vim.api.nvim_buf_get_lines(buf, 0, -1, false)[cursor[1]])
     local color_table
