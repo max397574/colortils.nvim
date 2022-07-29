@@ -65,6 +65,7 @@ Supported formats are the following:
 - `rgb`/`rgba` (both with percentage and absolute values, e.g. `rgb(255, 255, 0)`/`rgb(100%, 100%, 0%, 0.5)`)
 - `hex` (`#FFAB00`)
 - `hsl`/`hsla` (`hsl(60, 100%, 50%)`, `hsla(60, 100%, 50%, 0.4)`)
+- Css color names (only as argument)
 
 ### Usage
 You can use the different tools with commands.
@@ -72,7 +73,6 @@ Those take the format `Colortils <tool> <color>`.
 The color can be any of the supported formats.
 Notice that symbols like `#`, `%` and space need to be escaped like e.g. this `\#FF00AB`.
 
-The color can be supplied as argument.
 If no valid color is provided as argument the color under the cursor (if available) will be used.
 If there isn't any found the user will be asked for input (notice that you don't need to escape characters there).
 
