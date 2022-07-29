@@ -23,7 +23,7 @@
 - Some utilities for css colors
     - List Colors
 
-## 📦 Installation and Usage
+## 📦 Installation
 
 Use you favourite package manager and call the setup function.
 ```lua
@@ -35,24 +35,6 @@ use {
   end,
 }
 ```
-
-You can use the `Colortils` command to use this plugin.
-
-#### Color picker
-Use `Colortils picker` to access the color picker.
-You can provide an optional argument which is the intial color the picker will have.
-This is a hex color code without the `#` at the beginning (e.g. FF00AB).
-
-You can use `h`/`l` to change the color value under the cursor.
-With `<cr>` you can yank the color in with the default format into the register specified in settings (see defaults below).
-You can use `g<cr>` to get a prompt in which you can choose the format.
-
-With `<m-cr>`/`g<m-cr>` you can replace the color under the cursor instead of copying into a register.
-
-#### Css Utilities
-##### List colors
-Use `:Colortils css list` to get a list of all the colors in a floating window.
-This will *try* (**it's not a dependency**) to attach [nvim-colorizer.lua](https://github.com/norcalli/nvim-colorizer.lua) ([maintained fork](https://github.com/xiyaowong/nvim-colorizer.lua)).
 
 ## ⚙️ Customization
 You can change the settings by passing options to the setup function.
@@ -78,11 +60,21 @@ require("colortils").setup({
 
 ## 👀 Tools
 
+### Supported Formats
+Supported formats are the following:
+- `rgb`/`rgba` (both with percentage and absolute values, e.g. `rgb(255, 255, 0)`/`rgb(100%, 100%, 0%, 0.5)`)
+- `hex` (`#FFAB00`)
+- `hsl`/`hsla` (`hsl(60, 100%, 50%)`, `hsla(60, 100%, 50%, 0.4)`)
+
 ### Usage
 You can use the different tools with commands.
 Those take the format `Colortils <tool> <color>`.
-The color can either just be a 6 digit hex code (e.g. `FFAB00`) or one with a `#`.
-Notice that the `#` needs to be escaped like this `#FF00AB`.
+The color can be any of the supported formats.
+Notice that symbols like `#`, `%` and space need to be escaped like e.g. this `\#FF00AB`.
+
+The color can be supplied as argument.
+If no valid color is provided as argument the color under the cursor (if available) will be used.
+If there isn't any found the user will be asked for input (notice that you don't need to escape characters there).
 
 If no color is provided colortils checks if there is a color under the cursor and if so uses this one.
 If there is no color under the cursor the user gets asked for input.
@@ -95,6 +87,9 @@ With `q` you can close the tools.
 
 With most tools you can use `<cr>` to save the currently selected color to the register speicified in the config.
 If this isn't the case or something is special it will be written below.
+You can use `g<cr>` to get a prompt in which you can choose the format.
+
+With `<m-cr>`/`g<m-cr>` you can replace the color under the cursor instead of copying into a register.
 
 You can use `E` to export the currently selected color to a different tool and modify it there.
 
