@@ -20,42 +20,47 @@ colortils.settings = {
         replace_choose_format = "g<m-cr>",
         export = "E",
         set_value = "c",
-        transparency="T",
+        transparency = "T",
     },
 }
 
 local utils = require("colortils.utils")
+local color_utils = require("colortils.utils.colors")
 local css = require("colortils.css")
 local log = require("colortils.log")
 
 --- Gets a color to be used with the tools
 ---@param color? string
 ---@param invalid boolean
----@return string Color
+---@return table color_table
 local function get_color(color, invalid)
     color = color or ""
-    if color:match("^#%x%x%x%x%x%x$") then
-        return color
-    elseif color:match("^%x%x%x%x%x%x$") then
-        return "#" .. color
-    elseif not color and vim.fn.expand("<cword>"):match("^%x%x%x%x%x%x$") then
-        return "#" .. vim.fn.expand("<cword>")
+    local color_table = color_utils.get_colors(color)
+    -- check if table available, not empty and only found one color
+    if color_table and color_table ~= {} and #color_table == 1 then
+        return color_table[1]
+    end
+    color_table = color_utils.get_color_under_cursor(0)
+    if color_table and color_table ~= {} then
+        return color_table
     end
     if invalid then
-        color = vim.fn.input("Input a valid color > ", "#RRGGBB")
+        color = vim.fn.input("Input a valid color > ", "")
     else
-        color = vim.fn.input("Input a color > ", "#RRGGBB")
+        color = vim.fn.input("Input a color > ", "")
     end
-    if not color:match("^#%x%x%x%x%x%x$") then
-        color = get_color(nil, true)
-    end
-    return color
+    color_table = get_color(color, true)
+    return color_table
 end
 
 local commands = {
     ["picker"] = function(args)
         local color = get_color(args.fargs[2])
-        require("colortils.tools.picker")(color)
+        local hex_string = "#"
+            .. utils.hex(color.rgb_values[1])
+            .. utils.hex(color.rgb_values[2])
+            .. utils.hex(color.rgb_values[3])
+        require("colortils.tools.picker")(hex_string)
     end,
     ["css"] = function(args)
         if args.fargs[2] == "list" then
@@ -65,19 +70,44 @@ local commands = {
     ["gradient"] = function(args)
         local color_1 = get_color(args.fargs[2])
         local color_2 = get_color(args.fargs[3])
-        require("colortils.tools.gradients.colors")(color_1, color_2)
+        color_1 = color_1[1]
+        color_2 = color_2[1]
+        local hex_string_1 = "#"
+            .. utils.hex(color_1.rgb_values[1])
+            .. utils.hex(color_1.rgb_values[2])
+            .. utils.hex(color_1.rgb_values[3])
+        local hex_string_2 = "#"
+            .. utils.hex(color_2.rgb_values[2])
+            .. utils.hex(color_2.rgb_values[2])
+            .. utils.hex(color_2.rgb_values[3])
+        require("colortils.tools.gradients.colors")(hex_string_1, hex_string_2)
     end,
     ["greyscale"] = function(args)
         local color = get_color(args.fargs[2])
-        require("colortils.tools.gradients.greyscale")(color)
+        color = color[1]
+        local hex_string = "#"
+            .. utils.hex(color.rgb_values[1])
+            .. utils.hex(color.rgb_values[2])
+            .. utils.hex(color.rgb_values[3])
+        require("colortils.tools.gradients.greyscale")(hex_string)
     end,
     ["lighten"] = function(args)
         local color = get_color(args.fargs[2])
-        require("colortils.tools.lighten")(color)
+        color = color[1]
+        local hex_string = "#"
+            .. utils.hex(color.rgb_values[1])
+            .. utils.hex(color.rgb_values[2])
+            .. utils.hex(color.rgb_values[3])
+        require("colortils.tools.lighten")(hex_string)
     end,
     ["darken"] = function(args)
         local color = get_color(args.fargs[2])
-        require("colortils.tools.darken")(color)
+        color = color[1]
+        local hex_string = "#"
+            .. utils.hex(color.rgb_values[1])
+            .. utils.hex(color.rgb_values[2])
+            .. utils.hex(color.rgb_values[3])
+        require("colortils.tools.darken")(hex_string)
     end,
 }
 
@@ -93,9 +123,10 @@ local function create_command()
         exec_command(args)
     end, {
         desc = "Colortils command",
-        complete = function()
-            return { "picker" }
-        end,
+        -- complete = function()
+        --     return { "picker" }
+        -- end,
+        -- complete = "file",
         nargs = "+",
     })
 end
