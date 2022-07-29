@@ -77,22 +77,22 @@ local commands = {
         if css.get_color_value(args.fargs[2]) ~= "" then
             hex_string_1 = css.get_color_value(args.fargs[2])
         else
-            local color_1 = get_color(args.fargs[2])
-            color_1 = color_1[1]
+            local color = get_color(args.fargs[2])
+            color = color[1]
             hex_string_1 = "#"
-                .. utils.hex(color_1.rgb_values[1])
-                .. utils.hex(color_1.rgb_values[2])
-                .. utils.hex(color_1.rgb_values[3])
+                .. utils.hex(color.rgb_values[1])
+                .. utils.hex(color.rgb_values[2])
+                .. utils.hex(color.rgb_values[3])
         end
         if css.get_color_value(args.fargs[3]) ~= "" then
             hex_string_2 = css.get_color_value(args.fargs[3])
         else
-            local color_2 = get_color(args.fargs[3])
-            color_2 = color_2[1]
+            local color = get_color(args.fargs[3])
+            color = color[1]
             hex_string_2 = "#"
-                .. utils.hex(color_2.rgb_values[2])
-                .. utils.hex(color_2.rgb_values[2])
-                .. utils.hex(color_2.rgb_values[3])
+                .. utils.hex(color.rgb_values[2])
+                .. utils.hex(color.rgb_values[2])
+                .. utils.hex(color.rgb_values[3])
         end
         require("colortils.tools.gradients.colors")(hex_string_1, hex_string_2)
     end,
