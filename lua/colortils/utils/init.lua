@@ -1,9 +1,6 @@
 local utils = {}
 
----@diagnostic disable-next-line: unused-local
-local log = require("colortils.log")
-
---- Get the hex code of a number (two digits)
+--- Get the hex code of a number
 ---@param number number
 ---@return string
 function utils.hex(number)
@@ -22,7 +19,7 @@ function utils.round_float(number)
     end
 end
 
---- Adjust a color value (with maximum and minimum)
+--- Adjust a color value (kept inside 0-255)
 ---@param value number
 ---@param amount number
 ---@return number adjusted
@@ -56,8 +53,8 @@ end
 
 --- Produces a progress bar
 ---@param value number
----@param max_value number Maximum possible value
----@param max_width number Maximum possible width of the bar (value==max_value)
+---@param max_value number Max possible value
+---@param max_width number Max possible width
 ---@return string Bar
 function utils.get_bar(value, max_value, max_width)
     -- get value of one block
@@ -65,26 +62,6 @@ function utils.get_bar(value, max_value, max_width)
     -- get amount of full blocks
     local bar = string.rep("█", math.floor(value / block_value))
     return bar .. utils.get_partial_block(value / block_value - math.floor(value / block_value))
-end
-
---- Checks if is valid color
----@param color string Hex color code
-function utils.validate_color_complete(color)
-    if color:match("^#%x%x%x%x%x%x$") then
-        return true
-    else
-        return false
-    end
-end
-
---- Checks if is valid color
----@param color string Hex color code without #
-function utils.validate_color_numbers(color)
-    if color:match("^%x%x%x%x%x%x$") then
-        return true
-    else
-        return false
-    end
 end
 
 -- TODO: make this custom for better errors
