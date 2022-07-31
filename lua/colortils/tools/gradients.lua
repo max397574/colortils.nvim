@@ -56,13 +56,17 @@ return function(color, color_2)
     })
     vim.api.nvim_win_set_option(win, "cursorline", false)
     color_utils.display_gradient(buf, ns, 0, color, color_2, 51)
-    vim.opt_local.guicursor = "a:ver1-Cursor/Cursor"
-    local cursor_fg = vim.api.nvim_get_hl_by_name("Cursor", true).foreground
-    local cursor_bg = vim.api.nvim_get_hl_by_name("Cursor", true).background
+    if vim.api.nvim_exec("hi NormalFloat", true):match("NormalFloat%s*xxx%s*cleared") then
+        vim.api.nvim_set_hl(0, "NormalFloat", { link = "Normal" })
+    end
     vim.api.nvim_set_hl(0, "Cursor", {
         fg = vim.api.nvim_get_hl_by_name("NormalFloat", true).background,
         bg = vim.api.nvim_get_hl_by_name("NormalFloat", true).background,
     })
+    vim.opt_local.guicursor = "a:ver1-Cursor/Cursor"
+    local cursor_fg = vim.api.nvim_get_hl_by_name("Cursor", true).foreground
+    local cursor_bg = vim.api.nvim_get_hl_by_name("Cursor", true).background
+
     vim.api.nvim_create_autocmd("CursorMoved", {
         callback = function()
             vim.api.nvim_win_set_cursor(win, { 2, 1 })
