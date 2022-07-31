@@ -51,6 +51,16 @@ function utils_color.gradient_colors(start_color, end_color, total_length)
     return gradient_colors
 end
 
+---@param alpha number 0-1
+function utils_color.get_blended_gradient(start_color, end_color, length, alpha, background)
+    local blended_gradient = {}
+    local gradient = utils_color.gradient_colors(start_color, end_color, length)
+    for _, color in ipairs(gradient) do
+        blended_gradient[#blended_gradient + 1] = utils_color.blend_colors(color, background, alpha)
+    end
+    return blended_gradient
+end
+
 utils_color.display_gradient =
     --- Displays gradient at a certain position
     ---@param buf number
@@ -59,9 +69,21 @@ utils_color.display_gradient =
     ---@param start_color string "#xxxxxx"
     ---@param end_color string "#xxxxxx"
     ---@param width number
-    function(buf, ns, line, start_color, end_color, width)
+    ---@param alpha
+    function(buf, ns, line, start_color, end_color, width, alpha, background)
         width = width * 2
-        local gradient = utils_color.gradient_colors(start_color, end_color, width)
+        local gradient
+        if alpha then
+            gradient = utils_color.get_blended_gradient(
+                start_color,
+                end_color,
+                width,
+                alpha,
+                background or vim.fn.input("Background >")
+            )
+        else
+            gradient = utils_color.gradient_colors(start_color, end_color, width)
+        end
         vim.api.nvim_buf_set_lines(buf, line, line, false, { string.rep("▌", width / 2) })
         for i = 1, width do
             vim.api.nvim_set_hl(
