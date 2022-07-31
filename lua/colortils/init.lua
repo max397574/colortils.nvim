@@ -64,7 +64,11 @@ local commands = {
             .. utils.hex(color.rgb_values[1])
             .. utils.hex(color.rgb_values[2])
             .. utils.hex(color.rgb_values[3])
-        require("colortils.tools.picker")(hex_string)
+        local alpha
+        if color.transparency then
+            alpha = color.rgb_values[4] or nil
+        end
+        require("colortils.tools.picker")(hex_string, alpha)
     end,
     ["css"] = function(args)
         if args.fargs[2] == "list" then

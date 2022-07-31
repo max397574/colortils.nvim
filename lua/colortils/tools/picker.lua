@@ -474,7 +474,7 @@ local function create_mappings()
     })
 end
 
-return function(color)
+return function(color, alpha)
     old_cursor_pos = { 0, 1 }
     red, green, blue = color_utils.get_values(color)
     buf = vim.api.nvim_create_buf(false, true)
@@ -547,4 +547,12 @@ return function(color)
     update_highlight()
     set_picker_lines()
     vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
+    if alpha then
+        vim.api.nvim_win_set_height(win, 6)
+        transparency = alpha * 100
+        vim.cmd([[redraw]])
+        update_highlight()
+        set_picker_lines()
+        vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
+    end
 end
