@@ -82,7 +82,6 @@ local commands = {
             hex_string_1 = css.get_color_value(args.fargs[2])
         else
             local color = get_color(args.fargs[2])
-            color = color[1]
             hex_string_1 = "#"
                 .. utils.hex(color.rgb_values[1])
                 .. utils.hex(color.rgb_values[2])
@@ -92,7 +91,6 @@ local commands = {
             hex_string_2 = css.get_color_value(args.fargs[3])
         else
             local color = get_color(args.fargs[3])
-            color = color[1]
             hex_string_2 = "#"
                 .. utils.hex(color.rgb_values[2])
                 .. utils.hex(color.rgb_values[2])
