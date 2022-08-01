@@ -7,6 +7,7 @@ colortils.settings = {
     ---String: "hex"|"rgb"|"hsl"
     default_format = "hex",
     border = "rounded",
+    background = "#FFFFFF",
     mappings = {
         increment = "l",
         decrement = "h",
