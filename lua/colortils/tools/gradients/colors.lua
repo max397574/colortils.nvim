@@ -1,3 +1,3 @@
-return function(color, color_2)
-    require("colortils.tools.gradients")(color, color_2)
+return function(color, color_2, alpha)
+    require("colortils.tools.gradients")(color, color_2, alpha)
 end
