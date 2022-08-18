@@ -260,13 +260,6 @@ return function(color, color_2, alpha_value)
             local bigger = false
             if cursor[1] > old_cursor_pos[1] or cursor[2] > old_cursor_pos[2] then
                 bigger = true
-                if transparency then
-                    row = math.min((old_cursor_pos[1] + 1), 4)
-                else
-                    row = math.min((old_cursor_pos[1] + 1), 2)
-                end
-            elseif cursor[1] < old_cursor_pos[1] or cursor[2] < old_cursor_pos[2] then
-                row = math.max(old_cursor_pos[1] - 1, 2)
             end
             if transparency then
                 if bigger then
