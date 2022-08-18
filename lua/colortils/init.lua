@@ -105,7 +105,6 @@ local commands = {
             return
         end
         local color = get_color(args.fargs[2])
-        color = color[1]
         local hex_string = "#"
             .. utils.hex(color.rgb_values[1])
             .. utils.hex(color.rgb_values[2])
@@ -118,7 +117,6 @@ local commands = {
             return
         end
         local color = get_color(args.fargs[2])
-        color = color[1]
         local hex_string = "#"
             .. utils.hex(color.rgb_values[1])
             .. utils.hex(color.rgb_values[2])
@@ -131,7 +129,6 @@ local commands = {
             return
         end
         local color = get_color(args.fargs[2])
-        color = color[1]
         local hex_string = "#"
             .. utils.hex(color.rgb_values[1])
             .. utils.hex(color.rgb_values[2])
