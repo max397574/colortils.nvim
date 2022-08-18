@@ -332,6 +332,7 @@ return function(color, color_2, alpha_value)
         end
         buf = nil
         win = nil
+        idx = 1
         transparency = nil
 
         vim.cmd([[q]])
