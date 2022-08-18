@@ -267,20 +267,20 @@ end
 
 local tools = {
     ["Picker"] = function(hex_color)
-        require("colortils.tools.picker")(hex_color)
+        require("colortils.tools.picker")(hex_color, transparency / 100)
     end,
     ["Gradient"] = function(hex_color)
         local second_color = get_color()
-        require("colortils.tools.gradients.colors")(hex_color, second_color)
+        require("colortils.tools.gradients.colors")(hex_color, second_color, transparency / 100)
     end,
     ["Greyscale"] = function(hex_color)
-        require("colortils.tools.gradients.greyscale")(hex_color)
+        require("colortils.tools.gradients.greyscale")(hex_color, transparency / 100)
     end,
     ["Lighten"] = function(hex_color)
-        require("colortils.tools.lighten")(hex_color)
+        require("colortils.tools.lighten")(hex_color, transparency / 100)
     end,
     ["Darken"] = function(hex_color)
-        require("colortils.tools.darken")(hex_color)
+        require("colortils.tools.darken")(hex_color, transparency / 100)
     end,
 }
 
@@ -294,13 +294,13 @@ local function export()
     vim.api.nvim_buf_delete(buf, {})
     buf = nil
     win = nil
-    transparency = nil
     vim.ui.select(
         { "Picker", "Gradient", "Greyscale", "Lighten", "Darken" },
         { prompt = "Choose tool" },
         function(item)
             local hex_color = "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
             tools[item](hex_color)
+            transparency = nil
         end
     )
 end
@@ -378,7 +378,7 @@ local function create_mappings()
     vim.keymap.set("n", colortils.settings.mappings.transparency, function()
         if not transparency then
             vim.api.nvim_win_set_height(win, 6)
-            transparency = 0
+            transparency = 100
             vim.cmd([[redraw]])
         else
             vim.api.nvim_win_set_height(win, 5)
@@ -543,7 +543,7 @@ return function(color, alpha)
     vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
     if alpha then
         vim.api.nvim_win_set_height(win, 6)
-        transparency = alpha * 100
+        transparency = (1 - alpha) * 100
         vim.cmd([[redraw]])
         update_highlight()
         set_picker_lines()
