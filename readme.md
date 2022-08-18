@@ -90,15 +90,16 @@ With `<m-cr>`/`g<m-cr>` you can replace the color under the cursor instead of co
 
 You can use `E` to export the currently selected color to a different tool and modify it there.
 
-#### Color Picker
-`Colortils picker <color>`
-
-![picker](https://user-images.githubusercontent.com/81827001/176244717-c4a3d4c5-bb95-4abc-93e0-3733bf87ddb0.png)
-
 ##### Transparency mode
 You can use `T` to toggle transparency mode.
 This will add another slider where you can choose the transparency.
 The preview and the color you'll export will change accordingly.
+
+
+#### Color Picker
+`Colortils picker <color>`
+
+![picker](https://user-images.githubusercontent.com/81827001/176244717-c4a3d4c5-bb95-4abc-93e0-3733bf87ddb0.png)
 
 ##### Saving color
 You can use `<cr>` to save the color into the register specified in the config.
