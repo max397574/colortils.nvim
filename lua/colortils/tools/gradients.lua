@@ -299,8 +299,6 @@ return function(color, color_2, alpha)
         end
         vim.api.nvim_win_close(state.win, true)
         vim.api.nvim_buf_delete(state.buf, {})
-        state.buf = nil
-        state.win = nil
         vim.ui.select(
             { "Picker", "Gradient", "Greyscale", "Lighten", "Darken" },
             { prompt = "Choose tool" },
@@ -308,7 +306,6 @@ return function(color, color_2, alpha)
                 local tmp_idx = idx
                 idx = 1
                 tools[item](colors.gradient_big[tmp_idx], state)
-                state.transparency = nil
             end
         )
     end
@@ -345,10 +342,7 @@ return function(color, color_2, alpha)
             vim.api.nvim_win_close(help_window, true)
             help_is_open = false
         end
-        state.buf = nil
-        state.win = nil
         idx = 1
-        state.transparency = nil
 
         vim.cmd([[q]])
     end
@@ -390,12 +384,9 @@ return function(color, color_2, alpha)
     vim.keymap.set("n", colortils.settings.mappings.set_register_default_format, function()
         vim.api.nvim_win_close(state.win, true)
         vim.api.nvim_buf_delete(state.buf, {})
-        state.buf = nil
-        state.win = nil
 
         vim.fn.setreg(settings.register, format_strings[settings.default_format]())
         idx = 1
-        state.transparency = nil
     end, {
         buffer = state.buf,
         noremap = true,
@@ -408,8 +399,6 @@ return function(color, color_2, alpha)
 
         vim.api.nvim_win_close(state.win, true)
         vim.api.nvim_buf_delete(state.buf, {})
-        state.buf = nil
-        state.win = nil
 
         vim.ui.select({
             "hex: " .. format_strings["hex"](),
@@ -421,7 +410,6 @@ return function(color, color_2, alpha)
             item = item:sub(1, 3)
             vim.fn.setreg(settings.register, format_strings[item]())
             idx = 1
-            state.transparency = nil
         end)
     end, {
         buffer = state.buf,
@@ -429,11 +417,8 @@ return function(color, color_2, alpha)
     vim.keymap.set("n", colortils.settings.mappings.replace_default_format, function()
         vim.api.nvim_win_close(state.win, true)
         vim.api.nvim_buf_delete(state.buf, {})
-        state.buf = nil
-        state.win = nil
         color_utils.replace_under_cursor(format_strings[settings.default_format]())
         idx = 1
-        state.transparency = nil
     end, {
         buffer = state.buf,
         noremap = true,
@@ -446,8 +431,6 @@ return function(color, color_2, alpha)
 
         vim.api.nvim_win_close(state.win, true)
         vim.api.nvim_buf_delete(state.buf, {})
-        state.buf = nil
-        state.win = nil
         vim.ui.select({
             "hex: " .. format_strings["hex"](),
             "rgb: " .. format_strings["rgb"](),
@@ -458,7 +441,6 @@ return function(color, color_2, alpha)
             item = item:sub(1, 3)
             color_utils.replace_under_cursor(format_strings[item]())
             idx = 1
-            state.transparency = nil
         end)
     end, {
         buffer = state.buf,
