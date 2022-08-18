@@ -406,8 +406,10 @@ local function create_mappings()
         vim.api.nvim_buf_set_option(help_buf, "bufhidden", "wipe")
         local lines = {
             "Keybindings",
-            "Increment:                                     " .. "l",
-            "Decrement:                                     " .. "h",
+            "Increment:                                     "
+                .. colortils.settings.mappings.increment,
+            "Decrement:                                     "
+                .. colortils.settings.mappings.decrement,
             "Increment big:                                 "
                 .. colortils.settings.mappings.increment_big,
             "Decrement big:                                 "
