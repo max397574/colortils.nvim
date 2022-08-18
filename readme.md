@@ -76,9 +76,6 @@ Notice that symbols like `#`, `%` and space need to be escaped like e.g. this `\
 If no valid color is provided as argument the color under the cursor (if available) will be used.
 If there isn't any found the user will be asked for input (notice that you don't need to escape characters there).
 
-If no color is provided colortils checks if there is a color under the cursor and if so uses this one.
-If there is no color under the cursor the user gets asked for input.
-
 #### Mappings
 You can use `h`/`l` and the mappings specified in the config to increment and decrement values or pick a position on a gradient.
 With `0` and `$` to go to the minimum and the maximum values instantly.
