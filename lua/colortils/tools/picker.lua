@@ -25,12 +25,8 @@ local function update_highlight()
         vim.api.nvim_set_hl(0, "ColorPickerPreview", {
             fg = color_utils.blend_colors(
                 "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue),
-                "#"
-                    .. string.format(
-                        "%x",
-                        vim.api.nvim_get_hl_by_name("NormalFloat", true).background
-                    ),
-                (100 - transparency) / 100
+                colortils.settings.background,
+                transparency / 100
             ),
         })
     end
@@ -120,14 +116,12 @@ local function set_picker_lines()
         table.insert(lines, colortils.settings.color_preview)
     end
     if transparency then
-        if transparency then
-            local transparency_string = "Transparency: "
-                .. string.rep(" ", 3 - #tostring(transparency))
-                .. transparency
-                .. " "
-                .. utils.get_bar(transparency, 100, 10)
-            table.insert(lines, transparency_string)
-        end
+        local transparency_string = "Transparency: "
+            .. string.rep(" ", 3 - #tostring(100 - transparency))
+            .. 100 - transparency
+            .. " "
+            .. utils.get_bar(100 - transparency, 100, 10)
+        table.insert(lines, transparency_string)
     end
     vim.api.nvim_buf_set_option(buf, "modifiable", true)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
@@ -148,7 +142,7 @@ local function adjust_color(amount)
     elseif row == 3 then
         blue = utils.adjust_value(blue, amount)
     elseif row == 6 then
-        transparency = math.max(math.min(transparency + amount, 100), 0)
+        transparency = math.max(math.min(transparency - amount, 100), 0)
     end
     update_highlight()
     set_picker_lines()
@@ -195,8 +189,8 @@ local function replace()
     vim.api.nvim_buf_delete(buf, {})
     buf = nil
     win = nil
-    transparency = nil
     color_utils.replace_under_cursor(format_strings[colortils.settings.default_format]())
+    transparency = nil
 end
 
 --- Replace color under cursor with choosen format
@@ -218,8 +212,8 @@ local function replace_select()
         prompt = "Choose format",
     }, function(item)
         item = item:sub(1, 3)
-        transparency = nil
         color_utils.replace_under_cursor(format_strings[item]())
+        transparency = nil
     end)
 end
 
