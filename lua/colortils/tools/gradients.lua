@@ -502,6 +502,8 @@ return function(color, color_2, alpha_value)
             "Select last color:                             "
                 .. colortils.settings.mappings.max_value,
             "Export to other tool:                          " .. colortils.settings.mappings.export,
+            "Toggle transparency:                           "
+                .. colortils.settings.mappings.transparency,
             "Save to register   `"
                 .. colortils.settings.register
                 .. "` with format "
