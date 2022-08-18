@@ -12,7 +12,6 @@ local help_window
 local transparency = nil
 local old_cursor_pos = { 0, 1 }
 local gradient_big
-local first_color, second_color, alpha
 
 --- Sets the marker which indeicates position on the gradient
 local function set_marker()
@@ -25,7 +24,7 @@ local function set_marker()
     )
 end
 
-local function update()
+local function update(colors)
     vim.api.nvim_buf_set_option(buf, "modifiable", true)
     vim.api.nvim_buf_set_lines(buf, 0, 1, false, {})
     if transparency then
@@ -33,14 +32,14 @@ local function update()
             buf,
             ns,
             0,
-            first_color,
-            second_color,
+            colors.first_color,
+            colors.second_color,
             51,
             transparency / 100,
             colortils.settings.background
         )
     else
-        color_utils.display_gradient(buf, ns, 0, first_color, second_color, 51)
+        color_utils.display_gradient(buf, ns, 0, colors.first_color, colors.second_color, 51)
     end
 
     vim.api.nvim_set_hl(0, "ColorPickerPreview", { fg = gradient_big[idx] })
@@ -108,9 +107,9 @@ local function decrease(amount)
     end
 end
 
-local function toggle_transparency()
-    if not alpha then
-        alpha = 1
+local function toggle_transparency(colors)
+    if not colors.alpha then
+        colors.alpha = 1
     end
     if not transparency then
         vim.api.nvim_win_set_height(win, 4)
@@ -122,22 +121,23 @@ local function toggle_transparency()
     end
     if transparency then
         gradient_big = require("colortils.utils.colors").get_blended_gradient(
-            first_color,
-            second_color,
+            colors.first_color,
+            colors.second_color,
             255,
-            alpha,
+            colors.alpha,
             colortils.settings.background
         )
     else
         gradient_big = require("colortils.utils.colors").gradient_colors(
-            first_color,
-            second_color,
+            colors.first_color,
+            colors.second_color,
             255
         )
     end
 
-    update()
+    update(colors)
     vim.cmd([[redraw]])
+    return colors
 end
 
 local function get_color(color, invalid)
@@ -184,9 +184,10 @@ local tools = {
 }
 
 return function(color, color_2, alpha_value)
-    first_color = color
-    second_color = color_2
-    alpha = alpha_value
+    local colors = {}
+    colors.first_color = color
+    colors.second_color = color_2
+    colors.alpha = alpha_value
     old_cursor_pos = { 0, 1 }
     buf = vim.api.nvim_create_buf(false, true)
     win = vim.api.nvim_open_win(buf, true, {
@@ -204,10 +205,10 @@ return function(color, color_2, alpha_value)
         buf,
         ns,
         0,
-        first_color,
-        second_color,
+        colors.first_color,
+        colors.second_color,
         51,
-        alpha,
+        colors.alpha,
         colortils.settings.background
     )
     if vim.api.nvim_exec("hi NormalFloat", true):match("NormalFloat%s*xxx%s*cleared") then
@@ -236,16 +237,16 @@ return function(color, color_2, alpha_value)
 
     if transparency then
         gradient_big = require("colortils.utils.colors").get_blended_gradient(
-            first_color,
-            second_color,
+            colors.first_color,
+            colors.second_color,
             255,
-            alpha,
+            colors.alpha,
             colortils.settings.background
         )
     else
         gradient_big = require("colortils.utils.colors").gradient_colors(
-            first_color,
-            second_color,
+            colors.first_color,
+            colors.second_color,
             255
         )
     end
@@ -272,7 +273,7 @@ return function(color, color_2, alpha_value)
             end
             vim.api.nvim_win_set_cursor(win, { row, 0 })
             old_cursor_pos = { row, 0 }
-            update()
+            update(colors)
         end,
         buffer = buf,
     })
@@ -340,14 +341,14 @@ return function(color, color_2, alpha_value)
 
     vim.keymap.set("n", colortils.settings.mappings.increment, function()
         increase()
-        update()
+        update(colors)
     end, {
         buffer = buf,
         noremap = true,
     })
     vim.keymap.set("n", settings.mappings.increment_big, function()
         increase(5)
-        update()
+        update(colors)
     end, {
         buffer = buf,
         noremap = true,
@@ -367,7 +368,7 @@ return function(color, color_2, alpha_value)
 
     vim.keymap.set("n", colortils.settings.mappings.decrement, function()
         decrease()
-        update()
+        update(colors)
     end, {
         buffer = buf,
         noremap = true,
@@ -450,25 +451,25 @@ return function(color, color_2, alpha_value)
     })
     vim.keymap.set("n", settings.mappings.decrement_big, function()
         decrease(5)
-        update()
+        update(colors)
     end, {
         buffer = buf,
         noremap = true,
     })
     vim.keymap.set("n", colortils.settings.mappings.max_value, function()
         idx = 255
-        update()
+        update(colors)
     end, {
         buffer = buf,
     })
     vim.keymap.set("n", colortils.settings.mappings.min_value, function()
         idx = 1
-        update()
+        update(colors)
     end, {
         buffer = buf,
     })
     vim.keymap.set("n", colortils.settings.mappings.transparency, function()
-        toggle_transparency()
+        colors = toggle_transparency(colors)
     end, {
         buffer = buf,
     })
@@ -543,10 +544,10 @@ return function(color, color_2, alpha_value)
     end, {
         buffer = buf,
     })
-    if alpha then
-        transparency = alpha * 100
+    if colors.alpha then
+        transparency = colors.alpha * 100
         vim.api.nvim_win_set_height(win, 4)
     end
-    update()
+    update(colors)
     vim.api.nvim_win_set_cursor(win, { 2, 0 })
 end
