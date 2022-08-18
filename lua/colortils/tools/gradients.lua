@@ -1,13 +1,18 @@
 local color_utils = require("colortils.utils.colors")
 local settings = require("colortils").settings
 local idx = 1
-local buf
+local buf, win
+local utils = require("colortils.utils")
 local ns = vim.api.nvim_create_namespace("colortils_gradient")
 local help_ns = vim.api.nvim_create_namespace("colortils_gradient_help")
 local old_cursor = vim.opt.guicursor
 local colortils = require("colortils")
 local help_is_open = false
 local help_window
+local transparency = nil
+local old_cursor_pos = { 0, 1 }
+local gradient_big
+local first_color, second_color, alpha
 
 --- Sets the marker which indeicates position on the gradient
 local function set_marker()
@@ -20,31 +25,171 @@ local function set_marker()
     )
 end
 
+local function update()
+    vim.api.nvim_buf_set_option(buf, "modifiable", true)
+    vim.api.nvim_buf_set_lines(buf, 0, 1, false, {})
+    if transparency then
+        color_utils.display_gradient(
+            buf,
+            ns,
+            0,
+            first_color,
+            second_color,
+            51,
+            transparency / 100,
+            colortils.settings.background
+        )
+    else
+        color_utils.display_gradient(buf, ns, 0, first_color, second_color, 51)
+    end
+
+    vim.api.nvim_set_hl(0, "ColorPickerPreview", { fg = gradient_big[idx] })
+    if transparency then
+        vim.api.nvim_set_hl(0, "ColorPickerPreview", {
+            fg = color_utils.blend_colors(
+                gradient_big[idx],
+                colortils.settings.background,
+                transparency / 100
+            ),
+        })
+    end
+
+    local line
+    if string.find(settings.color_preview, "%s") then
+        line = string.format(settings.color_preview, gradient_big[idx])
+    else
+        line = settings.color_preview
+    end
+
+    set_marker()
+    vim.api.nvim_buf_set_lines(buf, 2, 3, false, { line })
+    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 2, 0, -1)
+    if transparency then
+        local transparency_string = "Transparency: "
+            .. string.rep(" ", 3 - #tostring(100 - transparency))
+            .. 100 - transparency
+            .. " "
+            .. require("colortils.utils").get_bar(100 - transparency, 100, 10)
+        vim.api.nvim_buf_set_lines(buf, 3, 4, false, { transparency_string })
+    end
+    vim.api.nvim_buf_set_option(buf, "modifiable", false)
+    vim.api.nvim_buf_add_highlight(buf, ns, "Bold", vim.api.nvim_win_get_cursor(0)[1] - 1, 0, -1)
+end
+
 --- Increases index
 ---@param amount number
 local function increase(amount)
+    local row = vim.api.nvim_win_get_cursor(win)[1]
     amount = amount or 1
-    if idx >= 51 * 5 then
+    if not vim.tbl_contains({ 2, 4 }, row) then
         return
     end
-    idx = idx + amount
-    idx = math.min(idx, 255)
+    if row == 2 then
+        idx = idx + amount
+        idx = math.min(idx, 255)
+    else
+        transparency = math.max(transparency - amount, 0)
+    end
 end
 
 --- Decreases index
 ---@param amount number
 local function decrease(amount)
+    local row = vim.api.nvim_win_get_cursor(win)[1]
     amount = amount or 1
-    if idx <= 1 then
+    if not vim.tbl_contains({ 2, 4 }, row) then
         return
     end
-    idx = idx - amount
-    idx = math.max(idx, 1)
+    if row == 2 then
+        idx = idx - amount
+        idx = math.max(idx, 1)
+    else
+        transparency = math.min(transparency + amount, 100)
+    end
 end
 
-return function(color, color_2)
+local function toggle_transparency()
+    if not alpha then
+        alpha = 1
+    end
+    if not transparency then
+        vim.api.nvim_win_set_height(win, 4)
+        transparency = 100
+        vim.cmd([[redraw]])
+    else
+        vim.api.nvim_win_set_height(win, 3)
+        transparency = nil
+    end
+    if transparency then
+        gradient_big = require("colortils.utils.colors").get_blended_gradient(
+            first_color,
+            second_color,
+            255,
+            alpha,
+            colortils.settings.background
+        )
+    else
+        gradient_big = require("colortils.utils.colors").gradient_colors(
+            first_color,
+            second_color,
+            255
+        )
+    end
+
+    update()
+    vim.cmd([[redraw]])
+end
+
+local function get_color(color, invalid)
+    color = color or ""
+    local color_table = color_utils.get_colors(color)
+    -- check if table available, not empty and only found one color
+    if color_table and color_table ~= {} and #color_table == 1 then
+        return color_table[1]
+    end
+    color_table = color_utils.get_color_under_cursor(0)
+    if color_table and color_table ~= {} then
+        return color_table
+    end
+    if invalid then
+        color = vim.fn.input("Input a valid color > ", "")
+    else
+        color = vim.fn.input("Input a color > ", "")
+    end
+    color_table = get_color(color, true)
+    return color_table
+end
+
+local tools = {
+    ["Picker"] = function(hex_color)
+        require("colortils.tools.picker")(hex_color, transparency / 100)
+    end,
+    ["Gradient"] = function(hex_color)
+        local color_2 = get_color()
+        local hex_color_2 = "#"
+            .. utils.hex(color_2.rgb_values[1])
+            .. utils.hex(color_2.rgb_values[2])
+            .. utils.hex(color_2.rgb_values[3])
+        require("colortils.tools.gradients.colors")(hex_color, hex_color_2, transparency / 100)
+    end,
+    ["Greyscale"] = function(hex_color)
+        require("colortils.tools.gradients.greyscale")(hex_color, transparency / 100)
+    end,
+    ["Lighten"] = function(hex_color)
+        require("colortils.tools.lighten")(hex_color, transparency / 100)
+    end,
+    ["Darken"] = function(hex_color)
+        require("colortils.tools.darken")(hex_color, transparency / 100)
+    end,
+}
+
+return function(color, color_2, alpha_value)
+    first_color = color
+    second_color = color_2
+    alpha = alpha_value
+    old_cursor_pos = { 0, 1 }
     buf = vim.api.nvim_create_buf(false, true)
-    local win = vim.api.nvim_open_win(buf, true, {
+    win = vim.api.nvim_open_win(buf, true, {
         relative = "editor",
         zindex = 90,
         width = 51,
@@ -55,24 +200,27 @@ return function(color, color_2)
         border = settings.border,
     })
     vim.api.nvim_win_set_option(win, "cursorline", false)
-    color_utils.display_gradient(buf, ns, 0, color, color_2, 51)
+    color_utils.display_gradient(
+        buf,
+        ns,
+        0,
+        first_color,
+        second_color,
+        51,
+        alpha,
+        colortils.settings.background
+    )
     if vim.api.nvim_exec("hi NormalFloat", true):match("NormalFloat%s*xxx%s*cleared") then
         vim.api.nvim_set_hl(0, "NormalFloat", { link = "Normal" })
     end
+    local cursor_fg = vim.api.nvim_get_hl_by_name("Cursor", true).foreground
+    local cursor_bg = vim.api.nvim_get_hl_by_name("Cursor", true).background
     vim.api.nvim_set_hl(0, "Cursor", {
         fg = vim.api.nvim_get_hl_by_name("NormalFloat", true).background,
         bg = vim.api.nvim_get_hl_by_name("NormalFloat", true).background,
     })
     vim.opt_local.guicursor = "a:ver1-Cursor/Cursor"
-    local cursor_fg = vim.api.nvim_get_hl_by_name("Cursor", true).foreground
-    local cursor_bg = vim.api.nvim_get_hl_by_name("Cursor", true).background
 
-    vim.api.nvim_create_autocmd("CursorMoved", {
-        callback = function()
-            vim.api.nvim_win_set_cursor(win, { 2, 1 })
-        end,
-        buffer = buf,
-    })
     vim.api.nvim_create_autocmd({
         "BufEnter",
     }, {
@@ -86,51 +234,55 @@ return function(color, color_2)
         end,
     })
 
-    local gradient_big = require("colortils.utils.colors").gradient_colors(color, color_2, 255)
-    local function update()
-        vim.api.nvim_set_hl(0, "ColorPickerPreview", { fg = gradient_big[idx] })
-        local line
-        if string.find(settings.color_preview, "%s") then
-            line = string.format(settings.color_preview, gradient_big[idx])
-        else
-            line = settings.color_preview
-        end
-
-        set_marker()
-        vim.api.nvim_buf_set_lines(buf, 2, 3, false, { line })
-        vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 2, 0, -1)
-    end
-    local function get_color(invalid)
-        local input_color
-        if invalid then
-            input_color = vim.fn.input("Input a valid color > ", "#RRGGBB")
-        else
-            input_color = vim.fn.input("Input a color > ", "#RRGGBB")
-        end
-        if not input_color:match("^#%x%x%x%x%x%x$") then
-            input_color = get_color(true)
-        end
-        return input_color
+    if transparency then
+        gradient_big = require("colortils.utils.colors").get_blended_gradient(
+            first_color,
+            second_color,
+            255,
+            alpha,
+            colortils.settings.background
+        )
+    else
+        gradient_big = require("colortils.utils.colors").gradient_colors(
+            first_color,
+            second_color,
+            255
+        )
     end
 
-    local tools = {
-        ["Picker"] = function(hex_color)
-            require("colortils.tools.picker")(hex_color)
+    vim.api.nvim_create_autocmd("CursorMoved", {
+        callback = function()
+            local cursor = vim.api.nvim_win_get_cursor(win)
+            local row = old_cursor_pos[1]
+            if cursor[1] == row and cursor[2] == old_cursor_pos[2] then
+                return
+            end
+            local bigger = false
+            if cursor[1] > old_cursor_pos[1] or cursor[2] > old_cursor_pos[2] then
+                bigger = true
+                if transparency then
+                    row = math.min((old_cursor_pos[1] + 1), 4)
+                else
+                    row = math.min((old_cursor_pos[1] + 1), 2)
+                end
+            elseif cursor[1] < old_cursor_pos[1] or cursor[2] < old_cursor_pos[2] then
+                row = math.max(old_cursor_pos[1] - 1, 2)
+            end
+            if transparency then
+                if bigger then
+                    row = 4
+                else
+                    row = 2
+                end
+            else
+                row = 2
+            end
+            vim.api.nvim_win_set_cursor(win, { row, 0 })
+            old_cursor_pos = { row, 0 }
+            update()
         end,
-        ["Gradient"] = function(hex_color)
-            local second_color = get_color()
-            require("colortils.tools.gradients.colors")(hex_color, second_color)
-        end,
-        ["Greyscale"] = function(hex_color)
-            require("colortils.tools.gradients.greyscale")(hex_color)
-        end,
-        ["Lighten"] = function(hex_color)
-            require("colortils.tools.lighten")(hex_color)
-        end,
-        ["Darken"] = function(hex_color)
-            require("colortils.tools.darken")(hex_color)
-        end,
-    }
+        buffer = buf,
+    })
 
     local function export()
         if help_is_open then
@@ -148,6 +300,7 @@ return function(color, color_2)
                 local tmp_idx = idx
                 idx = 1
                 tools[item](gradient_big[tmp_idx])
+                transparency = nil
             end
         )
     end
@@ -184,6 +337,10 @@ return function(color, color_2)
             vim.api.nvim_win_close(help_window, true)
             help_is_open = false
         end
+        buf = nil
+        win = nil
+        transparency = nil
+
         vim.cmd([[q]])
     end
 
@@ -226,8 +383,10 @@ return function(color, color_2)
         vim.api.nvim_buf_delete(buf, {})
         buf = nil
         win = nil
+
         vim.fn.setreg(settings.register, format_strings[settings.default_format]())
         idx = 1
+        transparency = nil
     end, {
         buffer = buf,
         noremap = true,
@@ -242,6 +401,7 @@ return function(color, color_2)
         vim.api.nvim_buf_delete(buf, {})
         buf = nil
         win = nil
+
         vim.ui.select({
             "hex: " .. format_strings["hex"](),
             "rgb: " .. format_strings["rgb"](),
@@ -252,6 +412,7 @@ return function(color, color_2)
             item = item:sub(1, 3)
             vim.fn.setreg(settings.register, format_strings[item]())
             idx = 1
+            transparency = nil
         end)
     end, {
         buffer = buf,
@@ -263,6 +424,7 @@ return function(color, color_2)
         win = nil
         color_utils.replace_under_cursor(format_strings[settings.default_format]())
         idx = 1
+        transparency = nil
     end, {
         buffer = buf,
         noremap = true,
@@ -287,6 +449,7 @@ return function(color, color_2)
             item = item:sub(1, 3)
             color_utils.replace_under_cursor(format_strings[item]())
             idx = 1
+            transparency = nil
         end)
     end, {
         buffer = buf,
@@ -307,6 +470,11 @@ return function(color, color_2)
     vim.keymap.set("n", colortils.settings.mappings.min_value, function()
         idx = 1
         update()
+    end, {
+        buffer = buf,
+    })
+    vim.keymap.set("n", colortils.settings.mappings.transparency, function()
+        toggle_transparency()
     end, {
         buffer = buf,
     })
@@ -379,5 +547,10 @@ return function(color, color_2)
     end, {
         buffer = buf,
     })
+    if alpha then
+        transparency = alpha * 100
+        vim.api.nvim_win_set_height(win, 4)
+    end
     update()
+    vim.api.nvim_win_set_cursor(win, { 2, 0 })
 end
