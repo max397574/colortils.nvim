@@ -167,7 +167,10 @@ end
 
 local tools = {
     ["Picker"] = function(hex_color, state)
-        require("colortils.tools.picker")(hex_color, 1 - state.transparency / 100)
+        require("colortils.tools.picker")(
+            hex_color,
+            state.transparency and (1 - state.transparency / 100)
+        )
     end,
     ["Gradient"] = function(hex_color, state)
         local color_2 = get_color()
@@ -178,17 +181,26 @@ local tools = {
         require("colortils.tools.gradients.colors")(
             hex_color,
             hex_color_2,
-            1 - state.transparency / 100
+            state.transparency and (1 - state.transparency / 100)
         )
     end,
     ["Greyscale"] = function(hex_color, state)
-        require("colortils.tools.gradients.greyscale")(hex_color, 1 - (state.transparency / 100))
+        require("colortils.tools.gradients.greyscale")(
+            hex_color,
+            state.transparency and (1 - state.transparency / 100)
+        )
     end,
     ["Lighten"] = function(hex_color, state)
-        require("colortils.tools.lighten")(hex_color, 1 - state.transparency / 100)
+        require("colortils.tools.lighten")(
+            hex_color,
+            state.transparency and (1 - state.transparency / 100)
+        )
     end,
     ["Darken"] = function(hex_color, state)
-        require("colortils.tools.darken")(hex_color, 1 - state.transparency / 100)
+        require("colortils.tools.darken")(
+            hex_color,
+            state.transparency and (1 - state.transparency / 100)
+        )
     end,
 }
 
