@@ -145,65 +145,6 @@ local function toggle_transparency(colors, state)
     return colors
 end
 
-local function get_color(color, invalid)
-    color = color or ""
-    local color_table = color_utils.get_colors(color)
-    -- check if table available, not empty and only found one color
-    if color_table and color_table ~= {} and #color_table == 1 then
-        return color_table[1]
-    end
-    color_table = color_utils.get_color_under_cursor(0)
-    if color_table and color_table ~= {} then
-        return color_table
-    end
-    if invalid then
-        color = vim.fn.input("Input a valid color > ", "")
-    else
-        color = vim.fn.input("Input a color > ", "")
-    end
-    color_table = get_color(color, true)
-    return color_table
-end
-
-local tools = {
-    ["Picker"] = function(hex_color, state)
-        require("colortils.tools.picker")(
-            hex_color,
-            state.transparency and (1 - state.transparency / 100)
-        )
-    end,
-    ["Gradient"] = function(hex_color, state)
-        local color_2 = get_color()
-        local hex_color_2 = "#"
-            .. utils.hex(color_2.rgb_values[1])
-            .. utils.hex(color_2.rgb_values[2])
-            .. utils.hex(color_2.rgb_values[3])
-        require("colortils.tools.gradients.colors")(
-            hex_color,
-            hex_color_2,
-            state.transparency and (1 - state.transparency / 100)
-        )
-    end,
-    ["Greyscale"] = function(hex_color, state)
-        require("colortils.tools.gradients.greyscale")(
-            hex_color,
-            state.transparency and (1 - state.transparency / 100)
-        )
-    end,
-    ["Lighten"] = function(hex_color, state)
-        require("colortils.tools.lighten")(
-            hex_color,
-            state.transparency and (1 - state.transparency / 100)
-        )
-    end,
-    ["Darken"] = function(hex_color, state)
-        require("colortils.tools.darken")(
-            hex_color,
-            state.transparency and (1 - state.transparency / 100)
-        )
-    end,
-}
-
 return function(color, color_2, alpha)
     local state = {}
     local help_state = {}
@@ -305,23 +246,6 @@ return function(color, color_2, alpha)
         buffer = state.buf,
     })
 
-    local function export()
-        if help_state.open then
-            vim.api.nvim_win_close(help_state.win, true)
-            help_state.open = false
-        end
-        vim.api.nvim_win_close(state.win, true)
-        vim.api.nvim_buf_delete(state.buf, {})
-        vim.ui.select(
-            { "Picker", "Gradient", "Greyscale", "Lighten", "Darken" },
-            { prompt = "Choose tool" },
-            function(item)
-                local tmp_idx = state.idx
-                tools[item](colors.gradient_big[tmp_idx], state)
-            end
-        )
-    end
-
     local format_strings = {
         ["hex"] = function()
             return colors.gradient_big[state.idx]
@@ -379,7 +303,25 @@ return function(color, color_2, alpha)
         noremap = true,
     })
     vim.keymap.set("n", colortils.settings.mappings.export, function()
-        export()
+        if help_state.open then
+            vim.api.nvim_win_close(help_state.win, true)
+            help_state.open = false
+        end
+        vim.api.nvim_win_close(state.win, true)
+        vim.api.nvim_buf_delete(state.buf, {})
+        vim.ui.select(
+            { "Picker", "Gradient", "Greyscale", "Lighten", "Darken" },
+            { prompt = "Choose tool" },
+            function(item)
+                require("colortils.utils.tools").export(
+                    item,
+                    colors.gradient_big[state.idx],
+                    state.transparency
+                )
+                -- local tmp_idx = state.idx
+                -- tools[item](colors.gradient_big[tmp_idx], state)
+            end
+        )
     end, {
         buffer = state.buf,
         noremap = true,
