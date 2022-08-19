@@ -26,7 +26,7 @@ local function update(colors, state)
             colors.first_color,
             colors.second_color,
             51,
-            state.transparency / 100,
+            1 - state.transparency / 100,
             colortils.settings.background
         )
     else
@@ -46,7 +46,7 @@ local function update(colors, state)
             fg = color_utils.blend_colors(
                 colors.gradient_big[state.idx],
                 colortils.settings.background,
-                state.transparency / 100
+                1 - state.transparency / 100
             ),
         })
     end
@@ -63,10 +63,10 @@ local function update(colors, state)
     vim.api.nvim_buf_add_highlight(state.buf, state.ns, "ColorPickerPreview", 2, 0, -1)
     if state.transparency then
         local transparency_string = "Transparency: "
-            .. string.rep(" ", 3 - #tostring(100 - state.transparency))
-            .. 100 - state.transparency
+            .. string.rep(" ", 3 - #tostring(state.transparency))
+            .. state.transparency
             .. " "
-            .. require("colortils.utils").get_bar(100 - state.transparency, 100, 10)
+            .. require("colortils.utils").get_bar(state.transparency, 100, 10)
         vim.api.nvim_buf_set_lines(state.buf, 3, 4, false, { transparency_string })
     end
     vim.api.nvim_buf_set_option(state.buf, "modifiable", false)
@@ -91,7 +91,7 @@ local function increase(amount, state)
         state.idx = state.idx + amount
         state.idx = math.min(state.idx, 255)
     else
-        state.transparency = math.max(state.transparency - amount, 0)
+        state.transparency = math.min(state.transparency + amount, 100)
     end
     return state
 end
@@ -107,7 +107,7 @@ local function decrease(amount, state)
         state.idx = state.idx - amount
         state.idx = math.max(state.idx, 1)
     else
-        state.transparency = math.min(state.transparency + amount, 100)
+        state.transparency = math.max(state.transparency - amount, 0)
     end
     return state
 end
@@ -118,7 +118,7 @@ local function toggle_transparency(colors, state)
     end
     if not state.transparency then
         vim.api.nvim_win_set_height(state.win, 4)
-        state.transparency = 100
+        state.transparency = 0
         vim.cmd([[redraw]])
     else
         vim.api.nvim_win_set_height(state.win, 3)
@@ -167,7 +167,7 @@ end
 
 local tools = {
     ["Picker"] = function(hex_color, state)
-        require("colortils.tools.picker")(hex_color, state.transparency / 100)
+        require("colortils.tools.picker")(hex_color, 1 - state.transparency / 100)
     end,
     ["Gradient"] = function(hex_color, state)
         local color_2 = get_color()
@@ -178,17 +178,17 @@ local tools = {
         require("colortils.tools.gradients.colors")(
             hex_color,
             hex_color_2,
-            state.transparency / 100
+            1 - state.transparency / 100
         )
     end,
     ["Greyscale"] = function(hex_color, state)
-        require("colortils.tools.gradients.greyscale")(hex_color, state.transparency / 100)
+        require("colortils.tools.gradients.greyscale")(hex_color, 1 - (state.transparency / 100))
     end,
     ["Lighten"] = function(hex_color, state)
-        require("colortils.tools.lighten")(hex_color, state.transparency / 100)
+        require("colortils.tools.lighten")(hex_color, 1 - state.transparency / 100)
     end,
     ["Darken"] = function(hex_color, state)
-        require("colortils.tools.darken")(hex_color, state.transparency / 100)
+        require("colortils.tools.darken")(hex_color, 1 - state.transparency / 100)
     end,
 }
 
@@ -535,7 +535,7 @@ return function(color, color_2, alpha)
         buffer = state.buf,
     })
     if colors.alpha then
-        state.transparency = colors.alpha * 100
+        state.transparency = (1 - colors.alpha) * 100
         vim.api.nvim_win_set_height(state.win, 4)
     end
     update(colors, state)

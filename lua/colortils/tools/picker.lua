@@ -26,7 +26,7 @@ local function update_highlight()
             fg = color_utils.blend_colors(
                 "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue),
                 colortils.settings.background,
-                transparency / 100
+                1 - transparency / 100
             ),
         })
     end
@@ -51,7 +51,7 @@ local format_strings = {
                 .. utils.hex(red)
                 .. utils.hex(green)
                 .. utils.hex(blue)
-                .. utils.hex(transparency / 100 * 255)
+                .. utils.hex((1 - transparency / 100) * 255)
         else
             return "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
         end
@@ -65,7 +65,7 @@ local format_strings = {
                 .. ", "
                 .. blue
                 .. ", "
-                .. transparency / 100
+                .. 1 - transparency / 100
                 .. ")"
         else
             return "rgb(" .. red .. ", " .. green .. ", " .. blue .. ")"
@@ -73,7 +73,9 @@ local format_strings = {
     end,
     ["hsl"] = function()
         if transparency then
-            local h, s, l, a = unpack(color_utils.rgb_to_hsl(red, green, blue, transparency / 100))
+            local h, s, l, a = unpack(
+                color_utils.rgb_to_hsl(red, green, blue, 1 - transparency / 100)
+            )
             return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%, " .. a .. ")"
         else
             local h, s, l = unpack(color_utils.rgb_to_hsl(red, green, blue))
@@ -117,10 +119,10 @@ local function set_picker_lines()
     end
     if transparency then
         local transparency_string = "Transparency: "
-            .. string.rep(" ", 3 - #tostring(100 - transparency))
-            .. 100 - transparency
+            .. string.rep(" ", 3 - #tostring(transparency))
+            .. transparency
             .. " "
-            .. utils.get_bar(100 - transparency, 100, 10)
+            .. utils.get_bar(transparency, 100, 10)
         table.insert(lines, transparency_string)
     end
     vim.api.nvim_buf_set_option(buf, "modifiable", true)
@@ -142,7 +144,7 @@ local function adjust_color(amount)
     elseif row == 3 then
         blue = utils.adjust_value(blue, amount)
     elseif row == 6 then
-        transparency = math.max(math.min(transparency - amount, 100), 0)
+        transparency = math.max(math.min(transparency + amount, 100), 0)
     end
     update_highlight()
     set_picker_lines()
@@ -267,20 +269,20 @@ end
 
 local tools = {
     ["Picker"] = function(hex_color)
-        require("colortils.tools.picker")(hex_color, transparency / 100)
+        require("colortils.tools.picker")(hex_color, 1 - transparency / 100)
     end,
     ["Gradient"] = function(hex_color)
         local second_color = get_color()
-        require("colortils.tools.gradients.colors")(hex_color, second_color, transparency / 100)
+        require("colortils.tools.gradients.colors")(hex_color, second_color, 1 - transparency / 100)
     end,
     ["Greyscale"] = function(hex_color)
-        require("colortils.tools.gradients.greyscale")(hex_color, transparency / 100)
+        require("colortils.tools.gradients.greyscale")(hex_color, 1 - transparency / 100)
     end,
     ["Lighten"] = function(hex_color)
-        require("colortils.tools.lighten")(hex_color, transparency / 100)
+        require("colortils.tools.lighten")(hex_color, 1 - transparency / 100)
     end,
     ["Darken"] = function(hex_color)
-        require("colortils.tools.darken")(hex_color, transparency / 100)
+        require("colortils.tools.darken")(hex_color, 1 - transparency / 100)
     end,
 }
 
@@ -378,7 +380,7 @@ local function create_mappings()
     vim.keymap.set("n", colortils.settings.mappings.transparency, function()
         if not transparency then
             vim.api.nvim_win_set_height(win, 6)
-            transparency = 100
+            transparency = 0
             vim.cmd([[redraw]])
         else
             vim.api.nvim_win_set_height(win, 5)
