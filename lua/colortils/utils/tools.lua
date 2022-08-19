@@ -1,4 +1,6 @@
 local tool_utils = {}
+---@alias Tool "Picker"|"Gradient"|"Greyscale"|"Lighten"|"Darken"
+
 local utils = require("colortils.utils")
 local color_utils = require("colortils.utils.colors")
 
@@ -37,7 +39,7 @@ local tools = {
 }
 
 --- Export a color to a different tool
----@param tool string "Picker"|"Gradient"|"Greyscale"|"Lighten"|"Darken"
+---@param tool Tool
 ---@param color string #RRGGBB
 ---@param transparency integer|nil
 function tool_utils.export(tool, color, transparency)
