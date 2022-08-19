@@ -1,7 +1,5 @@
 local color_utils = require("colortils.utils.colors")
 local settings = require("colortils").settings
-local utils = require("colortils.utils")
-local old_cursor = vim.opt.guicursor
 local colortils = require("colortils")
 
 --- Sets the marker which indeicates position on the gradient
@@ -18,45 +16,22 @@ end
 local function update(colors, state)
     vim.api.nvim_buf_set_option(state.buf, "modifiable", true)
     vim.api.nvim_buf_set_lines(state.buf, 0, 1, false, {})
-    if state.transparency then
-        color_utils.display_gradient(
-            state.buf,
-            state.ns,
-            0,
-            colors.first_color,
-            colors.second_color,
-            51,
-            1 - state.transparency / 100,
-            colortils.settings.background
-        )
-    else
-        color_utils.display_gradient(
-            state.buf,
-            state.ns,
-            0,
-            colors.first_color,
-            colors.second_color,
-            51
-        )
-    end
+    color_utils.display_gradient(
+        state.buf,
+        state.ns,
+        0,
+        colors.first_color,
+        colors.second_color,
+        51,
+        state.transparency and (1 - state.transparency / 100),
+        state.transparency and colortils.settings.background
+    )
 
     vim.api.nvim_set_hl(0, "ColorPickerPreview", { fg = colors.gradient_big[state.idx] })
-    if state.transparency then
-        vim.api.nvim_set_hl(0, "ColorPickerPreview", {
-            fg = color_utils.blend_colors(
-                colors.gradient_big[state.idx],
-                colortils.settings.background,
-                1 - state.transparency / 100
-            ),
-        })
-    end
 
-    local line
-    if string.find(settings.color_preview, "%s") then
-        line = string.format(settings.color_preview, colors.gradient_big[state.idx])
-    else
-        line = settings.color_preview
-    end
+    local line = string.find(settings.color_preview, "%s")
+            and string.format(settings.color_preview, colors.gradient_big[state.idx])
+        or settings.color_preview
 
     set_marker(state)
     vim.api.nvim_buf_set_lines(state.buf, 2, 3, false, { line })
@@ -68,6 +43,13 @@ local function update(colors, state)
             .. " "
             .. require("colortils.utils").get_bar(state.transparency, 100, 10)
         vim.api.nvim_buf_set_lines(state.buf, 3, 4, false, { transparency_string })
+        vim.api.nvim_set_hl(0, "ColorPickerPreview", {
+            fg = color_utils.blend_colors(
+                colors.gradient_big[state.idx],
+                colortils.settings.background,
+                1 - state.transparency / 100
+            ),
+        })
     end
     vim.api.nvim_buf_set_option(state.buf, "modifiable", false)
     vim.api.nvim_buf_add_highlight(
@@ -124,21 +106,13 @@ local function toggle_transparency(colors, state)
         vim.api.nvim_win_set_height(state.win, 3)
         state.transparency = nil
     end
-    if state.transparency then
-        colors.gradient_big = require("colortils.utils.colors").get_blended_gradient(
-            colors.first_color,
-            colors.second_color,
-            255,
-            colors.alpha,
-            colortils.settings.background
-        )
-    else
-        colors.gradient_big = require("colortils.utils.colors").gradient_colors(
-            colors.first_color,
-            colors.second_color,
-            255
-        )
-    end
+    colors.gradient_big = require("colortils.utils.colors").get_blended_gradient(
+        colors.first_color,
+        colors.second_color,
+        255,
+        state.transparency and (1 - state.transparency / 100),
+        state.transparency and colortils.settings.background
+    )
 
     update(colors, state)
     vim.cmd([[redraw]])
@@ -157,6 +131,7 @@ return function(color, color_2, alpha)
     colors.second_color = color_2
     colors.alpha = alpha
     state.old_cursor_pos = { 0, 1 }
+    local old_cursor = vim.opt.guicursor
     state.buf = vim.api.nvim_create_buf(false, true)
     state.win = vim.api.nvim_open_win(state.buf, true, {
         relative = "editor",
@@ -203,21 +178,13 @@ return function(color, color_2, alpha)
         end,
     })
 
-    if state.transparency then
-        colors.gradient_big = require("colortils.utils.colors").get_blended_gradient(
-            colors.first_color,
-            colors.second_color,
-            255,
-            colors.alpha,
-            colortils.settings.background
-        )
-    else
-        colors.gradient_big = require("colortils.utils.colors").gradient_colors(
-            colors.first_color,
-            colors.second_color,
-            255
-        )
-    end
+    colors.gradient_big = require("colortils.utils.colors").get_blended_gradient(
+        colors.first_color,
+        colors.second_color,
+        255,
+        state.transparency and (1 - state.transparency / 100),
+        state.transparency and colortils.settings.background
+    )
 
     vim.api.nvim_create_autocmd("CursorMoved", {
         callback = function()
@@ -230,15 +197,7 @@ return function(color, color_2, alpha)
             if cursor[1] > state.old_cursor_pos[1] or cursor[2] > state.old_cursor_pos[2] then
                 bigger = true
             end
-            if state.transparency then
-                if bigger then
-                    row = 4
-                else
-                    row = 2
-                end
-            else
-                row = 2
-            end
+            row = state.transparency and (bigger and 4 or 2) or 2
             vim.api.nvim_win_set_cursor(state.win, { row, 0 })
             state.old_cursor_pos = { row, 0 }
             update(colors, state)
