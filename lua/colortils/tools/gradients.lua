@@ -1,13 +1,8 @@
 local color_utils = require("colortils.utils.colors")
 local settings = require("colortils").settings
-local idx = 1
 local utils = require("colortils.utils")
-local help_ns = vim.api.nvim_create_namespace("colortils_gradient_help")
 local old_cursor = vim.opt.guicursor
 local colortils = require("colortils")
-local help_is_open = false
-local help_window
-local old_cursor_pos = { 0, 1 }
 
 --- Sets the marker which indeicates position on the gradient
 local function set_marker(state)
@@ -16,7 +11,7 @@ local function set_marker(state)
         1,
         2,
         false,
-        { string.rep(" ", math.floor(idx / 5) - 1) .. "^" }
+        { string.rep(" ", math.floor(state.idx / 5) - 1) .. "^" }
     )
 end
 
@@ -45,11 +40,11 @@ local function update(colors, state)
         )
     end
 
-    vim.api.nvim_set_hl(0, "ColorPickerPreview", { fg = colors.gradient_big[idx] })
+    vim.api.nvim_set_hl(0, "ColorPickerPreview", { fg = colors.gradient_big[state.idx] })
     if state.transparency then
         vim.api.nvim_set_hl(0, "ColorPickerPreview", {
             fg = color_utils.blend_colors(
-                colors.gradient_big[idx],
+                colors.gradient_big[state.idx],
                 colortils.settings.background,
                 state.transparency / 100
             ),
@@ -58,7 +53,7 @@ local function update(colors, state)
 
     local line
     if string.find(settings.color_preview, "%s") then
-        line = string.format(settings.color_preview, colors.gradient_big[idx])
+        line = string.format(settings.color_preview, colors.gradient_big[state.idx])
     else
         line = settings.color_preview
     end
@@ -93,11 +88,12 @@ local function increase(amount, state)
         return
     end
     if row == 2 then
-        idx = idx + amount
-        idx = math.min(idx, 255)
+        state.idx = state.idx + amount
+        state.idx = math.min(state.idx, 255)
     else
         state.transparency = math.max(state.transparency - amount, 0)
     end
+    return state
 end
 
 --- Decreases index
@@ -108,11 +104,12 @@ local function decrease(amount, state)
         return
     end
     if row == 2 then
-        idx = idx - amount
-        idx = math.max(idx, 1)
+        state.idx = state.idx - amount
+        state.idx = math.max(state.idx, 1)
     else
         state.transparency = math.min(state.transparency + amount, 100)
     end
+    return state
 end
 
 local function toggle_transparency(colors, state)
@@ -197,12 +194,16 @@ local tools = {
 
 return function(color, color_2, alpha)
     local state = {}
+    local help_state = {}
+    help_state.ns = vim.api.nvim_create_namespace("colortils_gradient_help")
+    help_state.open = false
     state.ns = vim.api.nvim_create_namespace("colortils_gradient")
+    state.idx = 1
     local colors = {}
     colors.first_color = color
     colors.second_color = color_2
     colors.alpha = alpha
-    old_cursor_pos = { 0, 1 }
+    state.old_cursor_pos = { 0, 1 }
     state.buf = vim.api.nvim_create_buf(false, true)
     state.win = vim.api.nvim_open_win(state.buf, true, {
         relative = "editor",
@@ -240,7 +241,7 @@ return function(color, color_2, alpha)
         "BufEnter",
     }, {
         callback = function()
-            if state.buf and vim.api.nvim_get_current_buf() == state.buf or help_is_open then
+            if state.buf and vim.api.nvim_get_current_buf() == state.buf or help_state.open then
                 vim.opt_local.guicursor = "a:ver1-Cursor/Cursor"
             else
                 vim.opt.guicursor = old_cursor
@@ -268,12 +269,12 @@ return function(color, color_2, alpha)
     vim.api.nvim_create_autocmd("CursorMoved", {
         callback = function()
             local cursor = vim.api.nvim_win_get_cursor(state.win)
-            local row = old_cursor_pos[1]
-            if cursor[1] == row and cursor[2] == old_cursor_pos[2] then
+            local row = state.old_cursor_pos[1]
+            if cursor[1] == row and cursor[2] == state.old_cursor_pos[2] then
                 return
             end
             local bigger = false
-            if cursor[1] > old_cursor_pos[1] or cursor[2] > old_cursor_pos[2] then
+            if cursor[1] > state.old_cursor_pos[1] or cursor[2] > state.old_cursor_pos[2] then
                 bigger = true
             end
             if state.transparency then
@@ -286,16 +287,16 @@ return function(color, color_2, alpha)
                 row = 2
             end
             vim.api.nvim_win_set_cursor(state.win, { row, 0 })
-            old_cursor_pos = { row, 0 }
+            state.old_cursor_pos = { row, 0 }
             update(colors, state)
         end,
         buffer = state.buf,
     })
 
     local function export()
-        if help_is_open then
-            vim.api.nvim_win_close(help_window, true)
-            help_is_open = false
+        if help_state.open then
+            vim.api.nvim_win_close(help_state.win, true)
+            help_state.open = false
         end
         vim.api.nvim_win_close(state.win, true)
         vim.api.nvim_buf_delete(state.buf, {})
@@ -303,8 +304,7 @@ return function(color, color_2, alpha)
             { "Picker", "Gradient", "Greyscale", "Lighten", "Darken" },
             { prompt = "Choose tool" },
             function(item)
-                local tmp_idx = idx
-                idx = 1
+                local tmp_idx = state.idx
                 tools[item](colors.gradient_big[tmp_idx], state)
             end
         )
@@ -312,10 +312,10 @@ return function(color, color_2, alpha)
 
     local format_strings = {
         ["hex"] = function()
-            return colors.gradient_big[idx]
+            return colors.gradient_big[state.idx]
         end,
         ["rgb"] = function()
-            local picked_color = colors.gradient_big[idx]
+            local picked_color = colors.gradient_big[state.idx]
             return "rgb("
                 .. tonumber(picked_color:sub(2, 3), 16)
                 .. ", "
@@ -325,7 +325,7 @@ return function(color, color_2, alpha)
                 .. ")"
         end,
         ["hsl"] = function()
-            local picked_color = colors.gradient_big[idx]
+            local picked_color = colors.gradient_big[state.idx]
             local h, s, l = unpack(
                 color_utils.rgb_to_hsl(
                     tonumber(picked_color:sub(2, 3), 16),
@@ -338,24 +338,23 @@ return function(color, color_2, alpha)
     }
 
     local function close()
-        if help_is_open then
-            vim.api.nvim_win_close(help_window, true)
-            help_is_open = false
+        if help_state.open then
+            vim.api.nvim_win_close(help_state.win, true)
+            help_state.open = false
         end
-        idx = 1
 
         vim.cmd([[q]])
     end
 
     vim.keymap.set("n", colortils.settings.mappings.increment, function()
-        increase(1, state)
+        state = increase(1, state)
         update(colors, state)
     end, {
         buffer = state.buf,
         noremap = true,
     })
     vim.keymap.set("n", settings.mappings.increment_big, function()
-        increase(5, state)
+        state = increase(5, state)
         update(colors, state)
     end, {
         buffer = state.buf,
@@ -375,7 +374,7 @@ return function(color, color_2, alpha)
     })
 
     vim.keymap.set("n", colortils.settings.mappings.decrement, function()
-        decrease(1, state)
+        state = decrease(1, state)
         update(colors, state)
     end, {
         buffer = state.buf,
@@ -386,15 +385,14 @@ return function(color, color_2, alpha)
         vim.api.nvim_buf_delete(state.buf, {})
 
         vim.fn.setreg(settings.register, format_strings[settings.default_format]())
-        idx = 1
     end, {
         buffer = state.buf,
         noremap = true,
     })
     vim.keymap.set("n", colortils.settings.mappings.set_register_choose_format, function()
-        if help_is_open then
-            vim.api.nvim_win_close(help_window, true)
-            help_is_open = false
+        if help_state.open then
+            vim.api.nvim_win_close(help_state.win, true)
+            help_state.open = false
         end
 
         vim.api.nvim_win_close(state.win, true)
@@ -409,7 +407,6 @@ return function(color, color_2, alpha)
         }, function(item)
             item = item:sub(1, 3)
             vim.fn.setreg(settings.register, format_strings[item]())
-            idx = 1
         end)
     end, {
         buffer = state.buf,
@@ -418,15 +415,14 @@ return function(color, color_2, alpha)
         vim.api.nvim_win_close(state.win, true)
         vim.api.nvim_buf_delete(state.buf, {})
         color_utils.replace_under_cursor(format_strings[settings.default_format]())
-        idx = 1
     end, {
         buffer = state.buf,
         noremap = true,
     })
     vim.keymap.set("n", colortils.settings.mappings.replace_choose_format, function()
-        if help_is_open then
-            vim.api.nvim_win_close(help_window, true)
-            help_is_open = false
+        if help_state.open then
+            vim.api.nvim_win_close(help_state.win, true)
+            help_state.open = false
         end
 
         vim.api.nvim_win_close(state.win, true)
@@ -440,26 +436,25 @@ return function(color, color_2, alpha)
         }, function(item)
             item = item:sub(1, 3)
             color_utils.replace_under_cursor(format_strings[item]())
-            idx = 1
         end)
     end, {
         buffer = state.buf,
     })
     vim.keymap.set("n", settings.mappings.decrement_big, function()
-        decrease(5, state)
+        state = decrease(5, state)
         update(colors, state)
     end, {
         buffer = state.buf,
         noremap = true,
     })
     vim.keymap.set("n", colortils.settings.mappings.max_value, function()
-        idx = 255
+        state.idx = 255
         update(colors, state)
     end, {
         buffer = state.buf,
     })
     vim.keymap.set("n", colortils.settings.mappings.min_value, function()
-        idx = 1
+        state.idx = 1
         update(colors, state)
     end, {
         buffer = state.buf,
@@ -470,14 +465,14 @@ return function(color, color_2, alpha)
         buffer = state.buf,
     })
     vim.keymap.set("n", "?", function()
-        if help_is_open then
-            vim.api.nvim_win_close(help_window, true)
-            help_is_open = false
+        if help_state.open then
+            vim.api.nvim_win_close(help_state.win, true)
+            help_state.open = false
             return
         end
-        help_is_open = true
-        local help_buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(help_buf, "bufhidden", "wipe")
+        help_state.open = true
+        help_state.buf = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_buf_set_option(help_state.buf, "bufhidden", "wipe")
         local lines = {
             "Keybindings",
             "Increment:                                     "
@@ -512,8 +507,8 @@ return function(color, color_2, alpha)
             "Choose format and replace color under cursor:  "
                 .. colortils.settings.mappings.replace_choose_format,
         }
-        vim.api.nvim_buf_set_lines(help_buf, 0, -1, false, lines)
-        help_window = vim.api.nvim_open_win(help_buf, false, {
+        vim.api.nvim_buf_set_lines(help_state.buf, 0, -1, false, lines)
+        help_state.win = vim.api.nvim_open_win(help_state.buf, false, {
             relative = "editor",
             col = 63,
             row = 5,
@@ -523,20 +518,19 @@ return function(color, color_2, alpha)
             border = "rounded",
             style = "minimal",
         })
-        vim.api.nvim_buf_add_highlight(help_buf, help_ns, "Special", 0, 0, -1)
+        vim.api.nvim_buf_add_highlight(help_state.buf, help_state.ns, "Special", 0, 0, -1)
         for i = 1, 11, 1 do
-            vim.api.nvim_buf_add_highlight(help_buf, help_ns, "String", i, 0, 47)
-            vim.api.nvim_buf_add_highlight(help_buf, help_ns, "Keyword", i, 47, -1)
+            vim.api.nvim_buf_add_highlight(help_state.buf, help_state.ns, "String", i, 0, 47)
+            vim.api.nvim_buf_add_highlight(help_state.buf, help_state.ns, "Keyword", i, 47, -1)
         end
         vim.api.nvim_create_autocmd("WinClosed", {
-            pattern = tostring(help_window),
+            pattern = tostring(help_state.win),
             callback = function()
-                help_is_open = false
-                help_window = nil
-                help_buf = nil
+                help_state.open = false
+                help_state.buf = nil
             end,
         })
-        vim.api.nvim_buf_set_option(help_buf, "modifiable", false)
+        vim.api.nvim_buf_set_option(help_state.buf, "modifiable", false)
     end, {
         buffer = state.buf,
     })
