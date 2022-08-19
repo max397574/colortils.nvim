@@ -62,34 +62,18 @@ local function update(colors, state)
     )
 end
 
---- Increases index
+--- Adjusts index
 ---@param amount number
-local function increase(amount, state)
+local function adjust(amount, state)
     local row = vim.api.nvim_win_get_cursor(state.win)[1]
     if not vim.tbl_contains({ 2, 4 }, row) then
         return
     end
     if row == 2 then
         state.idx = state.idx + amount
-        state.idx = math.min(state.idx, 255)
+        state.idx = math.max(math.min(state.idx, 255), 0)
     else
-        state.transparency = math.min(state.transparency + amount, 100)
-    end
-    return state
-end
-
---- Decreases index
----@param amount number
-local function decrease(amount, state)
-    local row = vim.api.nvim_win_get_cursor(state.win)[1]
-    if not vim.tbl_contains({ 2, 4 }, row) then
-        return
-    end
-    if row == 2 then
-        state.idx = state.idx - amount
-        state.idx = math.max(state.idx, 1)
-    else
-        state.transparency = math.max(state.transparency - amount, 0)
+        state.transparency = math.max(math.min(state.transparency + amount, 100), 0)
     end
     return state
 end
@@ -242,14 +226,14 @@ return function(color, color_2, alpha)
     end
 
     vim.keymap.set("n", colortils.settings.mappings.increment, function()
-        state = increase(1, state)
+        state = adjust(1, state)
         update(colors, state)
     end, {
         buffer = state.buf,
         noremap = true,
     })
     vim.keymap.set("n", settings.mappings.increment_big, function()
-        state = increase(5, state)
+        state = adjust(5, state)
         update(colors, state)
     end, {
         buffer = state.buf,
@@ -287,7 +271,7 @@ return function(color, color_2, alpha)
     })
 
     vim.keymap.set("n", colortils.settings.mappings.decrement, function()
-        state = decrease(1, state)
+        state = adjust(-1, state)
         update(colors, state)
     end, {
         buffer = state.buf,
@@ -354,7 +338,7 @@ return function(color, color_2, alpha)
         buffer = state.buf,
     })
     vim.keymap.set("n", settings.mappings.decrement_big, function()
-        state = decrease(5, state)
+        state = adjust(-5, state)
         update(colors, state)
     end, {
         buffer = state.buf,
