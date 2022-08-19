@@ -4,14 +4,14 @@ local tool_utils = {}
 local utils = require("colortils.utils")
 local color_utils = require("colortils.utils.colors")
 
-local function get_color(color)
+function tool_utils.get_color(color)
     color = color or ""
     local color_table = color_utils.get_colors(color)
     if color_table and color_table ~= {} and #color_table == 1 then
         return color_table[1]
     end
     color = vim.fn.input("Input a color > ", "")
-    color_table = get_color(color)
+    color_table = tool_utils.get_color(color)
     return color_table
 end
 
@@ -20,7 +20,7 @@ local tools = {
         require("colortils.tools.picker")(hex_color, alpha)
     end,
     ["Gradient"] = function(hex_color, alpha)
-        local color_2 = get_color()
+        local color_2 = tool_utils.get_color()
         local hex_color_2 = "#"
             .. utils.hex(color_2.rgb_values[1])
             .. utils.hex(color_2.rgb_values[2])

@@ -22,6 +22,7 @@ colortils.settings = {
         export = "E",
         set_value = "c",
         transparency = "T",
+        choose_background = "B",
     },
 }
 

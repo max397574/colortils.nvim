@@ -8,6 +8,7 @@ local utils = require("colortils.utils")
 local color_utils = require("colortils.utils.colors")
 local ns = vim.api.nvim_create_namespace("ColorPicker")
 local help_ns = vim.api.nvim_create_namespace("colortils_picker_help")
+local settings = require("colortils").settings
 local old_cursor = vim.opt.guicursor
 local old_cursor_pos = { 0, 1 }
 local transparency = nil
@@ -16,11 +17,10 @@ local help_window
 
 --- Updates the highlight used for the preview
 local function update_highlight()
-    vim.api.nvim_set_hl(
-        0,
-        "ColorPickerPreview",
-        { fg = "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue) }
-    )
+    vim.api.nvim_set_hl(0, "ColorPickerPreview", {
+        fg = "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue),
+        bg = settings.background,
+    })
     if transparency then
         vim.api.nvim_set_hl(0, "ColorPickerPreview", {
             fg = color_utils.blend_colors(
@@ -28,6 +28,7 @@ local function update_highlight()
                 colortils.settings.background,
                 1 - transparency / 100
             ),
+            bg = settings.background,
         })
     end
 end
@@ -404,6 +405,23 @@ local function create_mappings()
     end, {
         buffer = buf,
     })
+    vim.keymap.set("n", colortils.settings.mappings.choose_background, function()
+        local bg_color = require("colortils.utils.tools").get_color()
+        local hex_color = "#"
+            .. utils.hex(bg_color.rgb_values[1])
+            .. utils.hex(bg_color.rgb_values[2])
+            .. utils.hex(bg_color.rgb_values[3])
+
+        require("colortils").settings.background = hex_color
+        settings = require("colortils").settings
+        update_highlight()
+        set_picker_lines()
+        vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
+    end, {
+        buffer = buf,
+        noremap = true,
+    })
+
     vim.keymap.set("n", "?", function()
         if help_is_open then
             vim.api.nvim_win_close(help_window, true)
@@ -496,7 +514,7 @@ return function(color, alpha)
         border = colortils.settings.border,
     })
     vim.api.nvim_win_set_option(win, "cursorline", false)
-    vim.api.nvim_set_hl(0, "ColortilsBlack", { fg = "#000000" })
+    vim.api.nvim_set_hl(0, "colortilsBlack", { fg = "#000000" })
     if vim.api.nvim_exec("hi NormalFloat", true):match("NormalFloat%s*xxx%s*cleared") then
         vim.api.nvim_set_hl(0, "NormalFloat", { link = "Normal" })
     end
@@ -549,15 +567,12 @@ return function(color, alpha)
         end,
     })
 
-    update_highlight()
-    set_picker_lines()
-    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
     if alpha then
         vim.api.nvim_win_set_height(win, 6)
         transparency = (1 - alpha) * 100
         vim.cmd([[redraw]])
-        update_highlight()
-        set_picker_lines()
-        vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
     end
+    update_highlight()
+    set_picker_lines()
+    vim.api.nvim_buf_add_highlight(buf, ns, "ColorPickerPreview", 4, 0, -1)
 end

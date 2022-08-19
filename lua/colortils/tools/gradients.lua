@@ -27,7 +27,11 @@ local function update(colors, state)
         state.transparency and colortils.settings.background
     )
 
-    vim.api.nvim_set_hl(0, "ColorPickerPreview", { fg = colors.gradient_big[state.idx] })
+    vim.api.nvim_set_hl(
+        0,
+        "ColorPickerPreview",
+        { fg = colors.gradient_big[state.idx], bg = settings.background }
+    )
 
     local line = string.find(settings.color_preview, "%s")
             and string.format(settings.color_preview, colors.gradient_big[state.idx])
@@ -49,6 +53,7 @@ local function update(colors, state)
                 colortils.settings.background,
                 1 - state.transparency / 100
             ),
+            bg = settings.background,
         })
     end
     vim.api.nvim_buf_set_option(state.buf, "modifiable", false)
@@ -104,6 +109,8 @@ local function toggle_transparency(colors, state)
 end
 
 return function(color, color_2, alpha)
+    local utils = require("colortils.utils")
+    settings = require("colortils").settings
     local state = {}
     local help_state = {}
     help_state.ns = vim.api.nvim_create_namespace("colortils_gradient_help")
@@ -430,6 +437,20 @@ return function(color, color_2, alpha)
         vim.api.nvim_buf_set_option(help_state.buf, "modifiable", false)
     end, {
         buffer = state.buf,
+    })
+    vim.keymap.set("n", colortils.settings.mappings.choose_background, function()
+        local bg_color = require("colortils.utils.tools").get_color()
+        local hex_color = "#"
+            .. utils.hex(bg_color.rgb_values[1])
+            .. utils.hex(bg_color.rgb_values[2])
+            .. utils.hex(bg_color.rgb_values[3])
+
+        require("colortils").settings.background = hex_color
+        settings = require("colortils").settings
+        update(colors, state)
+    end, {
+        buffer = state.buf,
+        noremap = true,
     })
     if colors.alpha then
         state.transparency = (1 - colors.alpha) * 100
