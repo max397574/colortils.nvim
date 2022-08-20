@@ -392,6 +392,8 @@ return function(color, color_2, alpha)
             "Select last color:                             "
                 .. colortils.settings.mappings.max_value,
             "Export to other tool:                          " .. colortils.settings.mappings.export,
+            "Change background:                             "
+                .. colortils.settings.mappings.choose_background,
             "Toggle transparency:                           "
                 .. colortils.settings.mappings.transparency,
             "Save to register   `"
@@ -418,7 +420,7 @@ return function(color, color_2, alpha)
             row = 5,
             zindex = 100,
             width = 60,
-            height = 12,
+            height = 13,
             border = "rounded",
             style = "minimal",
         })

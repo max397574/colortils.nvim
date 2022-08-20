@@ -448,6 +448,8 @@ local function create_mappings()
             "Select next value:                             " .. "j",
             "Select previous value:                         " .. "k",
             "Export to other tool:                          " .. colortils.settings.mappings.export,
+            "Change background:                             "
+                .. colortils.settings.mappings.choose_background,
             "Toggle transparency:                           "
                 .. colortils.settings.mappings.transparency,
             "Save to register   `"
@@ -474,7 +476,7 @@ local function create_mappings()
             row = -1,
             zindex = 100,
             width = 60,
-            height = 15,
+            height = 16,
             border = "rounded",
             style = "minimal",
         })
