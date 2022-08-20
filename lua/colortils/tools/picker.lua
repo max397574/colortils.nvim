@@ -507,7 +507,7 @@ return function(color, alpha)
     vim.api.nvim_buf_set_option(buf, "modifiable", false)
     win = vim.api.nvim_open_win(buf, true, {
         relative = "cursor",
-        width = 30,
+        width = 35,
         zindex = 100,
         col = 1,
         row = 1,
