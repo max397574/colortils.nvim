@@ -10,7 +10,6 @@ local ns = vim.api.nvim_create_namespace("ColorPicker")
 local help_ns = vim.api.nvim_create_namespace("colortils_picker_help")
 local settings = require("colortils").settings
 local old_cursor = vim.opt.guicursor
-local old_cursor_pos = { 0, 1 }
 local transparency = nil
 local help_is_open = false
 local help_window
@@ -500,7 +499,8 @@ local function create_mappings()
 end
 
 return function(color, alpha)
-    old_cursor_pos = { 0, 1 }
+    local state={}
+    state.old_cursor_pos = { 0, 1 }
     red, green, blue = color_utils.get_values(color)
     buf = vim.api.nvim_create_buf(false, true)
     create_mappings()
@@ -530,17 +530,17 @@ return function(color, alpha)
     vim.api.nvim_create_autocmd("CursorMoved", {
         callback = function()
             local cursor = vim.api.nvim_win_get_cursor(win)
-            local row = old_cursor_pos[1]
+            local row = state.old_cursor_pos[1]
             local bigger = false
-            if cursor[1] > old_cursor_pos[1] or cursor[2] > old_cursor_pos[2] then
+            if cursor[1] > state.old_cursor_pos[1] or cursor[2] > state.old_cursor_pos[2] then
                 bigger = true
                 if transparency then
-                    row = math.min((old_cursor_pos[1] + 1), 6)
+                    row = math.min((state.old_cursor_pos[1] + 1), 6)
                 else
-                    row = math.min((old_cursor_pos[1] + 1), 3)
+                    row = math.min((state.old_cursor_pos[1] + 1), 3)
                 end
-            elseif cursor[1] < old_cursor_pos[1] or cursor[2] < old_cursor_pos[2] then
-                row = math.max(old_cursor_pos[1] - 1, 1)
+            elseif cursor[1] < state.old_cursor_pos[1] or cursor[2] < state.old_cursor_pos[2] then
+                row = math.max(state.old_cursor_pos[1] - 1, 1)
             end
             if vim.tbl_contains({ 4, 5 }, row) then
                 if bigger then
@@ -552,7 +552,7 @@ return function(color, alpha)
             vim.api.nvim_win_set_cursor(win, { row, 0 })
             vim.api.nvim_buf_clear_namespace(buf, ns, 0, 3)
             vim.api.nvim_buf_add_highlight(buf, ns, "Bold", row - 1, 0, -1)
-            old_cursor_pos = { row, 0 }
+            state.old_cursor_pos = { row, 0 }
         end,
         buffer = buf,
     })
