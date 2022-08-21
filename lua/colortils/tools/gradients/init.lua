@@ -47,6 +47,7 @@ local format_strings = {
                 .. 1 - state.transparency / 100
                 .. ")"
         else
+            return "rgb(" .. red .. ", " .. green .. ", " .. blue .. ")"
         end
     end,
 }
