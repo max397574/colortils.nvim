@@ -1,6 +1,7 @@
 local color_utils = require("colortils.utils.colors")
 local settings = require("colortils").settings
 local colortils = require("colortils")
+local utils = require("colortils.utils")
 
 --- Sets the marker which indeicates position on the gradient
 local function set_marker(state)
@@ -12,6 +13,43 @@ local function set_marker(state)
         { string.rep(" ", math.floor(state.idx / 5) - 1) .. "^" }
     )
 end
+
+local format_strings = {
+    ["hex"] = function(color, state)
+        if state.transparency then
+            return color .. utils.hex((1 - state.transparency / 100) * 255)
+        else
+            return color
+        end
+    end,
+    ["hsl"] = function(color, state)
+        local red, green, blue = color_utils.get_values(color)
+        if state.transparency then
+            local h, s, l, a = unpack(
+                color_utils.rgb_to_hsl(red, green, blue, 1 - state.transparency / 100)
+            )
+            return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%, " .. a .. ")"
+        else
+            local h, s, l = unpack(color_utils.rgb_to_hsl(red, green, blue))
+            return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%)"
+        end
+    end,
+    ["rgb"] = function(color, state)
+        local red, green, blue = color_utils.get_values(color)
+        if state.transparency then
+            return "rgb("
+                .. red
+                .. ", "
+                .. green
+                .. ", "
+                .. blue
+                .. ", "
+                .. 1 - state.transparency / 100
+                .. ")"
+        else
+        end
+    end,
+}
 
 local function update(colors, state)
     vim.api.nvim_buf_set_option(state.buf, "modifiable", true)
@@ -34,7 +72,14 @@ local function update(colors, state)
     )
 
     local line = string.find(settings.color_preview, "%s")
-            and string.format(settings.color_preview, colors.gradient_big[state.idx])
+            and string.format(
+                settings.color_preview,
+                format_strings[colortils.settings.default_format](
+                    colors.gradient_big[state.idx],
+                    state
+                ),
+                state
+            )
         or settings.color_preview
 
     set_marker(state)
@@ -109,7 +154,6 @@ local function toggle_transparency(colors, state)
 end
 
 return function(color, color_2, alpha)
-    local utils = require("colortils.utils")
     settings = require("colortils").settings
     local state = {}
     local help_state = {}
@@ -196,33 +240,6 @@ return function(color, color_2, alpha)
         buffer = state.buf,
     })
 
-    local format_strings = {
-        ["hex"] = function()
-            return colors.gradient_big[state.idx]
-        end,
-        ["rgb"] = function()
-            local picked_color = colors.gradient_big[state.idx]
-            return "rgb("
-                .. tonumber(picked_color:sub(2, 3), 16)
-                .. ", "
-                .. tonumber(picked_color:sub(4, 5), 16)
-                .. ", "
-                .. tonumber(picked_color:sub(6, 7), 16)
-                .. ")"
-        end,
-        ["hsl"] = function()
-            local picked_color = colors.gradient_big[state.idx]
-            local h, s, l = unpack(
-                color_utils.rgb_to_hsl(
-                    tonumber(picked_color:sub(2, 3), 16),
-                    tonumber(picked_color:sub(4, 5), 16),
-                    tonumber(picked_color:sub(6, 7), 16)
-                )
-            )
-            return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%)"
-        end,
-    }
-
     local function close()
         if help_state.open then
             vim.api.nvim_win_close(help_state.win, true)
@@ -288,7 +305,10 @@ return function(color, color_2, alpha)
         vim.api.nvim_win_close(state.win, true)
         vim.api.nvim_buf_delete(state.buf, {})
 
-        vim.fn.setreg(settings.register, format_strings[settings.default_format]())
+        vim.fn.setreg(
+            settings.register,
+            format_strings[settings.default_format](colors.gradient_big[state.idx], state)
+        )
     end, {
         buffer = state.buf,
         noremap = true,
@@ -303,14 +323,17 @@ return function(color, color_2, alpha)
         vim.api.nvim_buf_delete(state.buf, {})
 
         vim.ui.select({
-            "hex: " .. format_strings["hex"](),
-            "rgb: " .. format_strings["rgb"](),
-            "hsl: " .. format_strings["hsl"](),
+            "hex: " .. format_strings["hex"](colors.gradient_big[state.idx], state),
+            "rgb: " .. format_strings["rgb"](colors.gradient_big[state.idx], state),
+            "hsl: " .. format_strings["hsl"](colors.gradient_big[state.idx], state),
         }, {
             prompt = "Choose format",
         }, function(item)
             item = item:sub(1, 3)
-            vim.fn.setreg(settings.register, format_strings[item]())
+            vim.fn.setreg(
+                settings.register,
+                format_strings[item](colors.gradient_big[state.idx], state)
+            )
         end)
     end, {
         buffer = state.buf,
@@ -318,7 +341,9 @@ return function(color, color_2, alpha)
     vim.keymap.set("n", colortils.settings.mappings.replace_default_format, function()
         vim.api.nvim_win_close(state.win, true)
         vim.api.nvim_buf_delete(state.buf, {})
-        color_utils.replace_under_cursor(format_strings[settings.default_format]())
+        color_utils.replace_under_cursor(
+            format_strings[settings.default_format](colors.gradient_big[state.idx], state)
+        )
     end, {
         buffer = state.buf,
         noremap = true,
@@ -332,14 +357,16 @@ return function(color, color_2, alpha)
         vim.api.nvim_win_close(state.win, true)
         vim.api.nvim_buf_delete(state.buf, {})
         vim.ui.select({
-            "hex: " .. format_strings["hex"](),
-            "rgb: " .. format_strings["rgb"](),
-            "hsl: " .. format_strings["hsl"](),
+            "hex: " .. format_strings["hex"](colors.gradient_big[state.idx], state),
+            "rgb: " .. format_strings["rgb"](colors.gradient_big[state.idx], state),
+            "hsl: " .. format_strings["hsl"](colors.gradient_big[state.idx], state),
         }, {
             prompt = "Choose format",
         }, function(item)
             item = item:sub(1, 3)
-            color_utils.replace_under_cursor(format_strings[item]())
+            color_utils.replace_under_cursor(
+                format_strings[item](colors.gradient_big[state.idx], state)
+            )
         end)
     end, {
         buffer = state.buf,
