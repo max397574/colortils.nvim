@@ -55,6 +55,9 @@ end
 function utils_color.get_blended_gradient(start_color, end_color, length, alpha, background)
     local blended_gradient = {}
     local gradient = utils_color.gradient_colors(start_color, end_color, length)
+    if not (alpha and background) then
+        return gradient
+    end
     for _, color in ipairs(gradient) do
         blended_gradient[#blended_gradient + 1] = utils_color.blend_colors(color, background, alpha)
     end
