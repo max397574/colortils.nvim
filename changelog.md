@@ -1,6 +1,104 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2022-08-29
+
+### Bug Fixes
+
+- Don't shadow variable
+- Remove usage of transparency when undefined
+- Close window after resetting help
+- Use start index to get matches
+- Close help when exporting or choosing format
+- Convert numbers to base 10
+- Properly close help
+- How complete help
+- Reset old cursor position
+- Allow floats in hsl pattern
+- Get bg from NormalFloat for cursor
+- Allow multiple digits in floats
+- Try to hide cursor properly
+- Return empty string/table instead of nil
+- Don't try to index color table
+- Don't try to index color
+- Reset index
+- Fix exporting without transparency
+- Made widther so colors won't wrap
+- Correct preview and use alpha
+- Add missing code
+
+### Documentation
+
+- Added changelog
+- Document new input method(s)
+- Document css colors
+- Moved description of transparency
+- Added more annotations
+- Updated new defaults
+- New demo video
+
+### Features
+
+- Allow different formats
+- Replace colors (#14)
+- Help window (#16)
+- Display export in help
+- Make much more mappings configurable
+- Hide cursor independent of highlight
+- Hide cursor properly
+- Better way of getting colors
+- Allow using css colors as input
+- Use alpha if found in color
+- Properly hide cursor
+- Display transparent gradients
+- Pass alpha value into functions
+- Add background for transparency
+- Change format for transparency
+- Export transparency
+- Added transparency support
+- Add transparency to keybindings help
+- Use mappings for config in help
+- Initial commit
+- Allow blended gradient to fallback
+- Added background and mapping to change it
+- Added background mapping to help
+- Move gradients.lua into folder
+
+### Miscellaneous Tasks
+
+- Autoformat with stylua
+
+### Refactor
+
+- Extract function for color under cursor
+- Rename variables
+- Cleanup
+- Rename variables
+- Put some variables into table
+- Moved variables into table
+- Move more variables into function
+- Make transparency value what is displayed
+- Use export from utils/tools
+- Get rid of if statements
+- Merge functions for adjusting
+- Get rid of some local variables
+
+### Testing
+
+- Add tests for `get_color`
+- Adjust to new return values
+- Remove removed functions
+
+### Cleanup
+
+- Removed unused code
+- Removed unnecessary nil assignments
+
+### Gitignore
+
+- Add some files for testing and todo
+- Added notes
+
 ## [1.0.0-alpha] - 2022-07-01
 
 ### Bug Fixes
