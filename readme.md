@@ -6,7 +6,7 @@
 
 </div>
 
-<img src=https://user-images.githubusercontent.com/81827001/172020187-8011c927-13b4-4f75-b0c3-e76117136416.gif width="500"/>
+https://user-images.githubusercontent.com/81827001/187237256-e8b736cc-17f3-4521-a2ad-3c814b503481.mov
 
 ## ✨ Features
 - rgb color picker
