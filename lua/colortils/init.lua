@@ -149,12 +149,11 @@ local function create_command()
     vim.api.nvim_create_user_command("Colortils", function(args)
         exec_command(args)
     end, {
+        nargs = "*",
+        complete = function(_, _)
+            return vim.tbl_keys(commands)
+        end,
         desc = "Colortils command",
-        -- complete = function()
-        --     return { "picker" }
-        -- end,
-        -- complete = "file",
-        nargs = "+",
     })
 end
 
