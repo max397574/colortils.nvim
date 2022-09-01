@@ -167,6 +167,7 @@ function colortils.setup(update)
     else
         colortils.settings = updated_settings
     end
+    vim.api.nvim_set_hl(0, "ColortilsCurrentLine", { bold = true, default = true })
     create_command()
 end
 

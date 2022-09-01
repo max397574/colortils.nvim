@@ -551,7 +551,7 @@ return function(color, alpha)
             end
             vim.api.nvim_win_set_cursor(win, { row, 0 })
             vim.api.nvim_buf_clear_namespace(buf, ns, 0, 3)
-            vim.api.nvim_buf_add_highlight(buf, ns, "Bold", row - 1, 0, -1)
+            vim.api.nvim_buf_add_highlight(buf, ns, "ColortilsCurrentLine", row - 1, 0, -1)
             state.old_cursor_pos = { row, 0 }
         end,
         buffer = buf,

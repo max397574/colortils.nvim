@@ -106,7 +106,7 @@ local function update(colors, state)
     vim.api.nvim_buf_add_highlight(
         state.buf,
         state.ns,
-        "Bold",
+        "ColortilsCurrentLine",
         vim.api.nvim_win_get_cursor(0)[1] - 1,
         0,
         -1

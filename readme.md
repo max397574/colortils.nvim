@@ -84,6 +84,9 @@ require("colortils").setup({
 })
 ```
 
+The row on which you are currently is highlighted with `ColortilsCurrentLine`.
+You can modify that to change the way the tools look.
+
 ## 👀 Tools
 
 ### Supported Formats
