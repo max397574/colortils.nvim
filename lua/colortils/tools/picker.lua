@@ -499,7 +499,7 @@ local function create_mappings()
 end
 
 return function(color, alpha)
-    local state={}
+    local state = {}
     state.old_cursor_pos = { 0, 1 }
     red, green, blue = color_utils.get_values(color)
     buf = vim.api.nvim_create_buf(false, true)
@@ -520,13 +520,13 @@ return function(color, alpha)
     if vim.api.nvim_exec("hi NormalFloat", true):match("NormalFloat%s*xxx%s*cleared") then
         vim.api.nvim_set_hl(0, "NormalFloat", { link = "Normal" })
     end
+    local cursor_fg = vim.api.nvim_get_hl_by_name("Cursor", true).foreground
+    local cursor_bg = vim.api.nvim_get_hl_by_name("Cursor", true).background
     vim.api.nvim_set_hl(0, "Cursor", {
         fg = vim.api.nvim_get_hl_by_name("NormalFloat", true).background,
         bg = vim.api.nvim_get_hl_by_name("NormalFloat", true).background,
     })
     vim.opt_local.guicursor = "a:ver1-Cursor/Cursor"
-    local cursor_fg = vim.api.nvim_get_hl_by_name("Cursor", true).foreground
-    local cursor_bg = vim.api.nvim_get_hl_by_name("Cursor", true).background
     vim.api.nvim_create_autocmd("CursorMoved", {
         callback = function()
             local cursor = vim.api.nvim_win_get_cursor(win)
