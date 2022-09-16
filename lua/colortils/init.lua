@@ -158,7 +158,7 @@ local function create_command()
 end
 
 --- Main setup function
----@param update table
+---@param update? table
 function colortils.setup(update)
     local updated_settings = vim.tbl_deep_extend("force", colortils.settings, update or {})
     local ok, err = pcall(utils.validate_settings, updated_settings)
