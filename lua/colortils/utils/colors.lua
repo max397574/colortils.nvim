@@ -43,10 +43,7 @@ function utils_color.gradient_colors(start_color, end_color, total_length)
             .. utils.hex(utils.round_float(start_green + green_step * i))
             .. utils.hex(utils.round_float(start_blue + blue_step * i))
     end
-    gradient_colors[#gradient_colors + 1] = "#"
-        .. utils.hex(end_red)
-        .. utils.hex(end_green)
-        .. utils.hex(end_blue)
+    gradient_colors[#gradient_colors + 1] = "#" .. utils.hex(end_red) .. utils.hex(end_green) .. utils.hex(end_blue)
 
     return gradient_colors
 end
@@ -89,21 +86,10 @@ utils_color.display_gradient =
         end
         vim.api.nvim_buf_set_lines(buf, line, line, false, { string.rep("▌", width / 2) })
         for i = 1, width do
-            vim.api.nvim_set_hl(
-                0,
-                "ColortilsGradient" .. i,
-                { fg = gradient[2 * i], bg = gradient[2 * i + 1] }
-            )
+            vim.api.nvim_set_hl(0, "ColortilsGradient" .. i, { fg = gradient[2 * i], bg = gradient[2 * i + 1] })
         end
         for i = 1, width do
-            vim.api.nvim_buf_add_highlight(
-                buf,
-                ns,
-                "ColortilsGradient" .. i,
-                line,
-                3 * i - 1,
-                3 * i
-            )
+            vim.api.nvim_buf_add_highlight(buf, ns, "ColortilsGradient" .. i, line, 3 * i - 1, 3 * i)
         end
     end
 
@@ -351,9 +337,7 @@ function utils_color.get_colors(color_string)
         {
             colors = function(match)
                 local values = {
-                    match:match(
-                        "hsla%((%d+%.?%d?)%s*,%s*(%d+%.?%d?)%%%s*,%s*(%d+%.?%d?)%%%s*,%s*(%d+%.?%d?)%s*%)"
-                    ),
+                    match:match("hsla%((%d+%.?%d?)%s*,%s*(%d+%.?%d?)%%%s*,%s*(%d+%.?%d?)%%%s*,%s*(%d+%.?%d?)%s*%)"),
                 }
                 local rgb = utils_color.hsl_to_rgb(values[1], values[2], values[3], values[4])
                 return { rgb[1], rgb[2], rgb[3], rgb[4] }

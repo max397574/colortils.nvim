@@ -58,24 +58,14 @@ local format_strings = {
     end,
     ["rgb"] = function()
         if transparency then
-            return "rgb("
-                .. red
-                .. ", "
-                .. green
-                .. ", "
-                .. blue
-                .. ", "
-                .. 1 - transparency / 100
-                .. ")"
+            return "rgb(" .. red .. ", " .. green .. ", " .. blue .. ", " .. 1 - transparency / 100 .. ")"
         else
             return "rgb(" .. red .. ", " .. green .. ", " .. blue .. ")"
         end
     end,
     ["hsl"] = function()
         if transparency then
-            local h, s, l, a = unpack(
-                color_utils.rgb_to_hsl(red, green, blue, 1 - transparency / 100)
-            )
+            local h, s, l, a = unpack(color_utils.rgb_to_hsl(red, green, blue, 1 - transparency / 100))
             return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%, " .. a .. ")"
         else
             local h, s, l = unpack(color_utils.rgb_to_hsl(red, green, blue))
@@ -109,10 +99,7 @@ local function set_picker_lines()
     if string.find(colortils.settings.color_preview, "%s") then
         table.insert(
             lines,
-            string.format(
-                colortils.settings.color_preview,
-                format_strings[colortils.settings.default_format]()
-            )
+            string.format(colortils.settings.color_preview, format_strings[colortils.settings.default_format]())
         )
     else
         table.insert(lines, colortils.settings.color_preview)
@@ -273,17 +260,10 @@ local tools = {
     end,
     ["Gradient"] = function(hex_color)
         local second_color = get_color()
-        require("colortils.tools.gradients.colors")(
-            hex_color,
-            second_color,
-            transparency and (1 - transparency / 100)
-        )
+        require("colortils.tools.gradients.colors")(hex_color, second_color, transparency and (1 - transparency / 100))
     end,
     ["Greyscale"] = function(hex_color)
-        require("colortils.tools.gradients.greyscale")(
-            hex_color,
-            transparency and (1 - transparency / 100)
-        )
+        require("colortils.tools.gradients.greyscale")(hex_color, transparency and (1 - transparency / 100))
     end,
     ["Lighten"] = function(hex_color)
         require("colortils.tools.lighten")(hex_color, transparency and (1 - transparency / 100))
@@ -303,15 +283,11 @@ local function export()
     vim.api.nvim_buf_delete(buf, {})
     buf = nil
     win = nil
-    vim.ui.select(
-        { "Picker", "Gradient", "Greyscale", "Lighten", "Darken" },
-        { prompt = "Choose tool" },
-        function(item)
-            local hex_color = "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
-            tools[item](hex_color)
-            transparency = nil
-        end
-    )
+    vim.ui.select({ "Picker", "Gradient", "Greyscale", "Lighten", "Darken" }, { prompt = "Choose tool" }, function(item)
+        local hex_color = "#" .. utils.hex(red) .. utils.hex(green) .. utils.hex(blue)
+        tools[item](hex_color)
+        transparency = nil
+    end)
 end
 
 --- Create the mappings for the picker buffer
@@ -432,25 +408,17 @@ local function create_mappings()
         vim.api.nvim_buf_set_option(help_buf, "bufhidden", "wipe")
         local lines = {
             "Keybindings",
-            "Increment:                                     "
-                .. colortils.settings.mappings.increment,
-            "Decrement:                                     "
-                .. colortils.settings.mappings.decrement,
-            "Increment big:                                 "
-                .. colortils.settings.mappings.increment_big,
-            "Decrement big:                                 "
-                .. colortils.settings.mappings.decrement_big,
-            "Set value to min:                              "
-                .. colortils.settings.mappings.min_value,
-            "Set value to max:                              "
-                .. colortils.settings.mappings.max_value,
+            "Increment:                                     " .. colortils.settings.mappings.increment,
+            "Decrement:                                     " .. colortils.settings.mappings.decrement,
+            "Increment big:                                 " .. colortils.settings.mappings.increment_big,
+            "Decrement big:                                 " .. colortils.settings.mappings.decrement_big,
+            "Set value to min:                              " .. colortils.settings.mappings.min_value,
+            "Set value to max:                              " .. colortils.settings.mappings.max_value,
             "Select next value:                             " .. "j",
             "Select previous value:                         " .. "k",
             "Export to other tool:                          " .. colortils.settings.mappings.export,
-            "Change background:                             "
-                .. colortils.settings.mappings.choose_background,
-            "Toggle transparency:                           "
-                .. colortils.settings.mappings.transparency,
+            "Change background:                             " .. colortils.settings.mappings.choose_background,
+            "Toggle transparency:                           " .. colortils.settings.mappings.transparency,
             "Save to register   `"
                 .. colortils.settings.register
                 .. "` with format "
@@ -465,8 +433,7 @@ local function create_mappings()
                 .. colortils.settings.default_format
                 .. ":    "
                 .. colortils.settings.mappings.replace_default_format,
-            "Choose format and replace color under cursor:  "
-                .. colortils.settings.mappings.replace_choose_format,
+            "Choose format and replace color under cursor:  " .. colortils.settings.mappings.replace_choose_format,
         }
         vim.api.nvim_buf_set_lines(help_buf, 0, -1, false, lines)
         help_window = vim.api.nvim_open_win(help_buf, false, {

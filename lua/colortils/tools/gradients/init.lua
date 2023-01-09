@@ -5,13 +5,7 @@ local utils = require("colortils.utils")
 
 --- Sets the marker which indeicates position on the gradient
 local function set_marker(state)
-    vim.api.nvim_buf_set_lines(
-        state.buf,
-        1,
-        2,
-        false,
-        { string.rep(" ", math.floor(state.idx / 5) - 1) .. "^" }
-    )
+    vim.api.nvim_buf_set_lines(state.buf, 1, 2, false, { string.rep(" ", math.floor(state.idx / 5) - 1) .. "^" })
 end
 
 local format_strings = {
@@ -25,9 +19,7 @@ local format_strings = {
     ["hsl"] = function(color, state)
         local red, green, blue = color_utils.get_values(color)
         if state.transparency then
-            local h, s, l, a = unpack(
-                color_utils.rgb_to_hsl(red, green, blue, 1 - state.transparency / 100)
-            )
+            local h, s, l, a = unpack(color_utils.rgb_to_hsl(red, green, blue, 1 - state.transparency / 100))
             return "hsl(" .. h .. ", " .. s .. "%, " .. l .. "%, " .. a .. ")"
         else
             local h, s, l = unpack(color_utils.rgb_to_hsl(red, green, blue))
@@ -37,15 +29,7 @@ local format_strings = {
     ["rgb"] = function(color, state)
         local red, green, blue = color_utils.get_values(color)
         if state.transparency then
-            return "rgb("
-                .. red
-                .. ", "
-                .. green
-                .. ", "
-                .. blue
-                .. ", "
-                .. 1 - state.transparency / 100
-                .. ")"
+            return "rgb(" .. red .. ", " .. green .. ", " .. blue .. ", " .. 1 - state.transparency / 100 .. ")"
         else
             return "rgb(" .. red .. ", " .. green .. ", " .. blue .. ")"
         end
@@ -66,19 +50,12 @@ local function update(colors, state)
         state.transparency and colortils.settings.background
     )
 
-    vim.api.nvim_set_hl(
-        0,
-        "ColorPickerPreview",
-        { fg = colors.gradient_big[state.idx], bg = settings.background }
-    )
+    vim.api.nvim_set_hl(0, "ColorPickerPreview", { fg = colors.gradient_big[state.idx], bg = settings.background })
 
     local line = string.find(settings.color_preview, "%s")
             and string.format(
                 settings.color_preview,
-                format_strings[colortils.settings.default_format](
-                    colors.gradient_big[state.idx],
-                    state
-                ),
+                format_strings[colortils.settings.default_format](colors.gradient_big[state.idx], state),
                 state
             )
         or settings.color_preview
@@ -281,11 +258,7 @@ return function(color, color_2, alpha)
             { "Picker", "Gradient", "Greyscale", "Lighten", "Darken" },
             { prompt = "Choose tool" },
             function(item)
-                require("colortils.utils.tools").export(
-                    item,
-                    colors.gradient_big[state.idx],
-                    state.transparency
-                )
+                require("colortils.utils.tools").export(item, colors.gradient_big[state.idx], state.transparency)
                 -- local tmp_idx = state.idx
                 -- tools[item](colors.gradient_big[tmp_idx], state)
             end
@@ -306,10 +279,7 @@ return function(color, color_2, alpha)
         vim.api.nvim_win_close(state.win, true)
         vim.api.nvim_buf_delete(state.buf, {})
 
-        vim.fn.setreg(
-            settings.register,
-            format_strings[settings.default_format](colors.gradient_big[state.idx], state)
-        )
+        vim.fn.setreg(settings.register, format_strings[settings.default_format](colors.gradient_big[state.idx], state))
     end, {
         buffer = state.buf,
         noremap = true,
@@ -331,10 +301,7 @@ return function(color, color_2, alpha)
             prompt = "Choose format",
         }, function(item)
             item = item:sub(1, 3)
-            vim.fn.setreg(
-                settings.register,
-                format_strings[item](colors.gradient_big[state.idx], state)
-            )
+            vim.fn.setreg(settings.register, format_strings[item](colors.gradient_big[state.idx], state))
         end)
     end, {
         buffer = state.buf,
@@ -342,9 +309,7 @@ return function(color, color_2, alpha)
     vim.keymap.set("n", colortils.settings.mappings.replace_default_format, function()
         vim.api.nvim_win_close(state.win, true)
         vim.api.nvim_buf_delete(state.buf, {})
-        color_utils.replace_under_cursor(
-            format_strings[settings.default_format](colors.gradient_big[state.idx], state)
-        )
+        color_utils.replace_under_cursor(format_strings[settings.default_format](colors.gradient_big[state.idx], state))
     end, {
         buffer = state.buf,
         noremap = true,
@@ -365,9 +330,7 @@ return function(color, color_2, alpha)
             prompt = "Choose format",
         }, function(item)
             item = item:sub(1, 3)
-            color_utils.replace_under_cursor(
-                format_strings[item](colors.gradient_big[state.idx], state)
-            )
+            color_utils.replace_under_cursor(format_strings[item](colors.gradient_big[state.idx], state))
         end)
     end, {
         buffer = state.buf,
@@ -407,23 +370,15 @@ return function(color, color_2, alpha)
         vim.api.nvim_buf_set_option(help_state.buf, "bufhidden", "wipe")
         local lines = {
             "Keybindings",
-            "Increment:                                     "
-                .. colortils.settings.mappings.increment,
-            "Decrement:                                     "
-                .. colortils.settings.mappings.decrement,
-            "Increment big:                                 "
-                .. colortils.settings.mappings.increment_big,
-            "Decrement big:                                 "
-                .. colortils.settings.mappings.decrement_big,
-            "Select first color:                            "
-                .. colortils.settings.mappings.min_value,
-            "Select last color:                             "
-                .. colortils.settings.mappings.max_value,
+            "Increment:                                     " .. colortils.settings.mappings.increment,
+            "Decrement:                                     " .. colortils.settings.mappings.decrement,
+            "Increment big:                                 " .. colortils.settings.mappings.increment_big,
+            "Decrement big:                                 " .. colortils.settings.mappings.decrement_big,
+            "Select first color:                            " .. colortils.settings.mappings.min_value,
+            "Select last color:                             " .. colortils.settings.mappings.max_value,
             "Export to other tool:                          " .. colortils.settings.mappings.export,
-            "Change background:                             "
-                .. colortils.settings.mappings.choose_background,
-            "Toggle transparency:                           "
-                .. colortils.settings.mappings.transparency,
+            "Change background:                             " .. colortils.settings.mappings.choose_background,
+            "Toggle transparency:                           " .. colortils.settings.mappings.transparency,
             "Save to register   `"
                 .. colortils.settings.register
                 .. "` with format "
@@ -438,8 +393,7 @@ return function(color, color_2, alpha)
                 .. colortils.settings.default_format
                 .. ":    "
                 .. colortils.settings.mappings.replace_default_format,
-            "Choose format and replace color under cursor:  "
-                .. colortils.settings.mappings.replace_choose_format,
+            "Choose format and replace color under cursor:  " .. colortils.settings.mappings.replace_choose_format,
         }
         vim.api.nvim_buf_set_lines(help_state.buf, 0, -1, false, lines)
         help_state.win = vim.api.nvim_open_win(help_state.buf, false, {

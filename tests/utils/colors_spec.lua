@@ -39,28 +39,23 @@ describe("Get colors from string", function()
         })
     end)
     it("Get rbg and hex color from one string", function()
-        assert.same(
-            require("colortils.utils.colors").get_colors(
-                "{ background: rgba(100%, 100%, 0%, 1) #ABff00; }"
-            ),
+        assert.same(require("colortils.utils.colors").get_colors("{ background: rgba(100%, 100%, 0%, 1) #ABff00; }"), {
             {
-                {
-                    end_pos = 45,
-                    match = "#ABff00",
-                    rgb_values = { 171, 255, 0 },
-                    start_pos = 39,
-                    transparency = false,
-                    type = "hex",
-                },
-                {
-                    end_pos = 37,
-                    match = "rgba(100%, 100%, 0%, 1)",
-                    rgb_values = { 255, 255, 0 },
-                    start_pos = 15,
-                    transparency = true,
-                    type = "rgba percentage",
-                },
-            }
-        )
+                end_pos = 45,
+                match = "#ABff00",
+                rgb_values = { 171, 255, 0 },
+                start_pos = 39,
+                transparency = false,
+                type = "hex",
+            },
+            {
+                end_pos = 37,
+                match = "rgba(100%, 100%, 0%, 1)",
+                rgb_values = { 255, 255, 0 },
+                start_pos = 15,
+                transparency = true,
+                type = "rgba percentage",
+            },
+        })
     end)
 end)

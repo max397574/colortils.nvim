@@ -48,11 +48,7 @@ local unpack = unpack or table.unpack
 function log.new(config, standalone)
     config = vim.tbl_deep_extend("force", default_config, config)
 
-    local outfile = string.format(
-        "%s/%s.log",
-        vim.api.nvim_call_function("stdpath", { "cache" }),
-        config.plugin
-    )
+    local outfile = string.format("%s/%s.log", vim.api.nvim_call_function("stdpath", { "cache" }), config.plugin)
 
     local obj
     if standalone then
@@ -104,23 +100,13 @@ function log.new(config, standalone)
         -- Output to console
         if config.use_console then
             local function log_to_console()
-                local console_string = string.format(
-                    "[%-6s%s] %s: %s",
-                    nameupper,
-                    os.date("%H:%M:%S"),
-                    lineinfo,
-                    msg
-                )
+                local console_string = string.format("[%-6s%s] %s: %s", nameupper, os.date("%H:%M:%S"), lineinfo, msg)
 
                 local split_console = vim.split(console_string, "\n")
                 for _, v in ipairs(split_console) do
                     local formatted_msg = string.format("[%s] %s", config.plugin, v) -- vim.fn.escape(v, [["\]]))
 
-                    local ok = pcall(
-                        vim.notify,
-                        string.format("%s", formatted_msg),
-                        level_config.level
-                    )
+                    local ok = pcall(vim.notify, string.format("%s", formatted_msg), level_config.level)
                     if not ok then
                         vim.api.nvim_out_write(msg .. "\n")
                     end
