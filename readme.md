@@ -164,3 +164,7 @@ You can use `g<cr>` to get prompted to choose a color format in which the color 
 
 # Similar Plugins
 This plugin has some things which are similar to [vim-colortemplate](https://github.com/lifepillar/vim-colortemplate).
+
+## ❤️ Support
+If you like the projects I do and they can help you in your life you can support my work with [github sponsors](https://github.com/sponsors/max397574).
+Every support motivates me to continue working on my open source projects.
