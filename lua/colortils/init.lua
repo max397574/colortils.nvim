@@ -141,7 +141,14 @@ local commands = {
 --- Executes command
 ---@param args table
 local function exec_command(args)
-    commands[args.fargs[1]](args)
+    local command = args.fargs[1]
+    if not command then
+      local msg = "Error: specify command, one of " .. table.concat(vim.tbl_keys(commands), ", ")
+      local add_to_history = false
+      vim.api.nvim_echo({{msg, "WarningMsg"}}, add_to_history, {})
+      return
+    end
+    commands[command](args)
 end
 
 --- Creates the `Colortils` command
