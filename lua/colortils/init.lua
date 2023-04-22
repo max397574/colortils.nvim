@@ -141,7 +141,7 @@ local commands = {
 --- Executes command
 ---@param args table
 local function exec_command(args)
-    commands[args.fargs[1]](args)
+    commands[args.fargs[1] or "picker"](args)
 end
 
 --- Creates the `Colortils` command
