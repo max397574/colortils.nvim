@@ -140,14 +140,14 @@ local commands = {
 
 --- Executes command
 ---@param args table
-local function exec_command(args)
+function colortils.exec_command(args)
     commands[args.fargs[1] or "picker"](args)
 end
 
 --- Creates the `Colortils` command
 local function create_command()
     vim.api.nvim_create_user_command("Colortils", function(args)
-        exec_command(args)
+        colortils.exec_command(args)
     end, {
         nargs = "*",
         complete = function(_, _)
