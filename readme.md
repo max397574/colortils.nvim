@@ -48,6 +48,8 @@ require("colortils").setup({
     -- The default in which colors should be saved
     -- This can be hex, hsl or rgb
     default_format = "hex",
+    -- String: default color if no color is found
+    default_color = "#000000",
     -- Border for the float
     border = "rounded",
     -- Some mappings which are used inside the tools
