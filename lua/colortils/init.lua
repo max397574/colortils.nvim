@@ -6,6 +6,8 @@ colortils.settings = {
     color_preview = "█ %s",
     ---String: "hex"|"rgb"|"hsl"
     default_format = "hex",
+    ---String: default color if no color is found
+    default_color = "#000000",
     border = "rounded",
     background = "#FFFFFF",
     mappings = {
@@ -47,7 +49,7 @@ local function get_color(color, invalid)
         return color_table
     end
     if invalid then
-        color = vim.fn.input("Input a valid color > ", "")
+        return get_color(colortils.settings.default_color, false)
     else
         color = vim.fn.input("Input a color > ", "")
     end
