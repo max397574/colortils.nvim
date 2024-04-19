@@ -48,6 +48,8 @@ require("colortils").setup({
     -- The default in which colors should be saved
     -- This can be hex, hsl or rgb
     default_format = "hex",
+    -- String: default color if no color is found
+    default_color = "#000000",
     -- Border for the float
     border = "rounded",
     -- Some mappings which are used inside the tools
@@ -67,7 +69,7 @@ require("colortils").setup({
         -- save the current color in the register specified above with the format specified above
         set_register_default_format = "<cr>",
         -- save the current color in the register specified above with a format you can choose
-        set_register_cjoose_format = "g<cr>",
+        set_register_choose_format = "g<cr>",
         -- replace the color under the cursor with the current color in the format specified above
         replace_default_format = "<m-cr>",
         -- replace the color under the cursor with the current color in a format you can choose
