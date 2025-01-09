@@ -247,6 +247,12 @@ return function(color, color_2, alpha)
         buffer = state.buf,
         noremap = true,
     })
+    vim.keymap.set("n", "<esc>", function()
+        close()
+    end, {
+        buffer = state.buf,
+        noremap = true,
+    })
     vim.keymap.set("n", colortils.settings.mappings.export, function()
         if help_state.open then
             vim.api.nvim_win_close(help_state.win, true)
