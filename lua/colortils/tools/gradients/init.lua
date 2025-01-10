@@ -241,18 +241,14 @@ return function(color, color_2, alpha)
         buffer = state.buf,
         noremap = true,
     })
-    vim.keymap.set("n", "q", function()
-        close()
-    end, {
-        buffer = state.buf,
-        noremap = true,
-    })
-    vim.keymap.set("n", "<esc>", function()
-        close()
-    end, {
-        buffer = state.buf,
-        noremap = true,
-    })
+    for _, value in ipairs(settings.mappings.quit_window) do
+        vim.keymap.set("n", value, function()
+            close()
+        end, {
+            buffer = state.buf,
+            noremap = true,
+        })
+    end
     vim.keymap.set("n", colortils.settings.mappings.export, function()
         if help_state.open then
             vim.api.nvim_win_close(help_state.win, true)

@@ -191,8 +191,9 @@ end
 function css.list_colors()
     local buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, css.get_formated_colors())
-    vim.keymap.set("n", "q", "<cmd>q<CR>", { noremap = true, buffer = buf })
-    vim.keymap.set("n", "<esc>", "<cmd>q<CR>", { noremap = true, buffer = buf })
+    for _, value in ipairs(require("colortils").settings.mappings.quit_window) do
+        vim.keymap.set("n", value, "<cmd>q<CR>", { noremap = true, buffer = buf })
+    end
     ---@diagnostic disable-next-line: unused-local
     local width = vim.api.nvim_win_get_width(0)
     local height = vim.api.nvim_win_get_height(0)
