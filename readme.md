@@ -82,6 +82,8 @@ require("colortils").setup({
         transparency = "T",
         -- choose the background (for transparent colors)
         choose_background = "B",
+        -- quit window
+        quit_window = { "q", "<esc>" }
     }
 })
 ```

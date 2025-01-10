@@ -292,19 +292,21 @@ end
 
 --- Create the mappings for the picker buffer
 local function create_mappings()
-    vim.keymap.set("n", "q", function()
-        if help_is_open then
-            help_is_open = false
-            vim.api.nvim_win_close(help_window, true)
-        end
-        vim.api.nvim_win_close(win, true)
-        vim.api.nvim_buf_delete(buf, {})
-        buf = nil
-        win = nil
-        transparency = nil
-    end, {
-        buffer = buf,
-    })
+    for _, k in ipairs(settings.mappings.quit_window) do
+        vim.keymap.set("n", k, function()
+            if help_is_open then
+                help_is_open = false
+                vim.api.nvim_win_close(help_window, true)
+            end
+            vim.api.nvim_win_close(win, true)
+            vim.api.nvim_buf_delete(buf, {})
+            buf = nil
+            win = nil
+            transparency = nil
+        end, {
+            buffer = buf,
+        })
+    end
     vim.keymap.set("n", colortils.settings.mappings.set_value, function()
         set_value()
     end, {
