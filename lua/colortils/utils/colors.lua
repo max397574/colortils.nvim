@@ -61,6 +61,8 @@ function utils_color.get_blended_gradient(start_color, end_color, length, alpha,
     return blended_gradient
 end
 
+local padding = "▌"
+
 utils_color.display_gradient =
     --- Displays gradient at a certain position
     ---@param buf number
@@ -84,14 +86,23 @@ utils_color.display_gradient =
         else
             gradient = utils_color.gradient_colors(start_color, end_color, width)
         end
-        vim.api.nvim_buf_set_lines(buf, line, line, false, { string.rep("▌", width / 2) })
+
+        local virt_text = {}
         for i = 1, width do
-            vim.api.nvim_set_hl(0, "ColortilsGradient" .. i, { fg = gradient[2 * i], bg = gradient[2 * i + 1] })
+            vim.api.nvim_set_hl(ns, "ColortilsGradient" .. i, { fg = gradient[2 * i], bg = gradient[2 * i + 1] })
         end
-        for i = 1, width do
-            vim.api.nvim_buf_add_highlight(buf, ns, "ColortilsGradient" .. i, line, 3 * i - 1, 3 * i)
+        for i = 1, (width / 2)  do
+          virt_text[i] = {padding, "ColortilsGradient" .. i}
         end
-    end
+        vim.api.nvim_buf_set_lines(buf, line, line, false, { string.rep(" ", width / 2) })
+        vim.api.nvim_buf_set_extmark(buf, ns, line, 0, {
+          end_col = width,
+          priority = 0,
+          virt_text = virt_text,
+          virt_text_pos = "overlay",
+          strict = false
+        })
+      end
 
 --- Gets the gray color for a certain color
 ---@param color string "#xxxxxx"
