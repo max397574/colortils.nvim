@@ -99,7 +99,7 @@ local function adjust(amount, state)
     end
     if row == 2 then
         state.idx = state.idx + amount
-        state.idx = math.max(math.min(state.idx, 255), 0)
+        state.idx = math.max(math.min(state.idx, 255), 1)
     else
         state.transparency = math.max(math.min(state.transparency + amount, 100), 0)
     end
