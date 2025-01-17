@@ -37,7 +37,7 @@ local format_strings = {
 }
 
 local function update(colors, state)
-    vim.api.nvim_buf_set_option(state.buf, "modifiable", true)
+    vim.api.nvim_set_option_value("modifiable", true, {buf = state.buf})
     vim.api.nvim_buf_set_lines(state.buf, 0, 1, false, {})
     color_utils.display_gradient(
         state.buf,
@@ -79,7 +79,7 @@ local function update(colors, state)
             bg = settings.background,
         })
     end
-    vim.api.nvim_buf_set_option(state.buf, "modifiable", false)
+    vim.api.nvim_set_option_value("modifiable", false, {buf = state.buf})
     vim.api.nvim_buf_add_highlight(
         state.buf,
         state.ns,
@@ -156,7 +156,8 @@ return function(color, color_2, alpha)
         height = 3,
         border = settings.border,
     })
-    vim.api.nvim_win_set_option(state.win, "cursorline", false)
+    vim.api.nvim_win_set_hl_ns(state.win, state.ns)
+    vim.api.nvim_set_option_value("cursorline", false, {win = state.win})
     color_utils.display_gradient(
         state.buf,
         state.ns,
@@ -167,14 +168,14 @@ return function(color, color_2, alpha)
         colors.alpha,
         colortils.settings.background
     )
-    if vim.api.nvim_exec("hi NormalFloat", true):match("NormalFloat%s*xxx%s*cleared") then
+    if next(vim.api.nvim_get_hl(0, {name = "NormalFloat"})) == nil then
         vim.api.nvim_set_hl(0, "NormalFloat", { link = "Normal" })
     end
-    local cursor_fg = vim.api.nvim_get_hl_by_name("Cursor", true).foreground
-    local cursor_bg = vim.api.nvim_get_hl_by_name("Cursor", true).background
+    local cursor_fg = vim.api.nvim_get_hl(0, {name="Cursor"}).fg
+    local cursor_bg = vim.api.nvim_get_hl(0, {name="Cursor"}).bg
     vim.api.nvim_set_hl(0, "Cursor", {
-        fg = vim.api.nvim_get_hl_by_name("NormalFloat", true).background,
-        bg = vim.api.nvim_get_hl_by_name("NormalFloat", true).background,
+        fg = vim.api.nvim_get_hl(0, {name = "NormalFloat"}).bg,
+        bg = vim.api.nvim_get_hl(0, {name = "NormalFloat"}).bg,
     })
     vim.opt_local.guicursor = "a:ver1-Cursor/Cursor"
 
@@ -369,7 +370,7 @@ return function(color, color_2, alpha)
         end
         help_state.open = true
         help_state.buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(help_state.buf, "bufhidden", "wipe")
+        vim.api.nvim_set_option_value("bufhidden", "wipe", {buf = help_state.buf})
         local lines = {
             "Keybindings",
             "Increment:                                     " .. colortils.settings.mappings.increment,
@@ -420,7 +421,7 @@ return function(color, color_2, alpha)
                 help_state.buf = nil
             end,
         })
-        vim.api.nvim_buf_set_option(help_state.buf, "modifiable", false)
+        vim.api.nvim_set_option_value("modifiable", false, {buf = help_state.buf})
     end, {
         buffer = state.buf,
     })
