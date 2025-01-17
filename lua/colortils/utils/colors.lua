@@ -91,18 +91,18 @@ utils_color.display_gradient =
         for i = 1, width do
             vim.api.nvim_set_hl(ns, "ColortilsGradient" .. i, { fg = gradient[2 * i], bg = gradient[2 * i + 1] })
         end
-        for i = 1, (width / 2)  do
-          virt_text[i] = {padding, "ColortilsGradient" .. i}
+        for i = 1, (width / 2) do
+            virt_text[i] = { padding, "ColortilsGradient" .. i }
         end
         vim.api.nvim_buf_set_lines(buf, line, line, false, { string.rep(" ", width / 2) })
         vim.api.nvim_buf_set_extmark(buf, ns, line, 0, {
-          end_col = width,
-          priority = 0,
-          virt_text = virt_text,
-          virt_text_pos = "overlay",
-          strict = false
+            end_col = width,
+            priority = 0,
+            virt_text = virt_text,
+            virt_text_pos = "overlay",
+            strict = false,
         })
-      end
+    end
 
 --- Gets the gray color for a certain color
 ---@param color string "#xxxxxx"
