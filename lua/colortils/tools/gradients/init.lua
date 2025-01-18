@@ -157,7 +157,6 @@ return function(color, color_2, alpha)
         border = settings.border,
     })
     vim.api.nvim_win_set_hl_ns(state.win, state.ns)
-    vim.api.nvim_set_option_value("cursorline", false, { win = state.win })
     color_utils.display_gradient(
         state.buf,
         state.ns,
@@ -176,6 +175,7 @@ return function(color, color_2, alpha)
     vim.api.nvim_set_hl(0, "Cursor", {
         fg = vim.api.nvim_get_hl(0, { name = "NormalFloat" }).bg,
         bg = vim.api.nvim_get_hl(0, { name = "NormalFloat" }).bg,
+        blend = 100,
     })
     vim.opt_local.guicursor = "a:ver1-Cursor/Cursor"
 
@@ -187,7 +187,7 @@ return function(color, color_2, alpha)
                 vim.opt_local.guicursor = "a:ver1-Cursor/Cursor"
             else
                 vim.opt.guicursor = old_cursor
-                vim.api.nvim_set_hl(0, "Cursor", { fg = cursor_fg, bg = cursor_bg })
+                vim.api.nvim_set_hl(0, "Cursor", { fg = cursor_fg, bg = cursor_bg, blend = 0 })
             end
         end,
     })

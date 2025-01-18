@@ -96,11 +96,10 @@ utils_color.display_gradient =
         end
         vim.api.nvim_buf_set_lines(buf, line, line, false, { string.rep(" ", width / 2) })
         vim.api.nvim_buf_set_extmark(buf, ns, line, 0, {
-            end_col = width,
-            priority = 0,
+            end_col = (width / 2) - 1,
             virt_text = virt_text,
             virt_text_pos = "overlay",
-            strict = false,
+            hl_eol = false,
         })
     end
 
