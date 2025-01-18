@@ -25,7 +25,7 @@ colortils.settings = {
         set_value = "c",
         transparency = "T",
         choose_background = "B",
-        quit_window = { "q", "<esc>" }
+        quit_window = { "q", "<esc>" },
     },
 }
 

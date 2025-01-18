@@ -1,3 +1,6 @@
+lint:
+	stylua lua/
+
 test:
 	nvim --headless --noplugin \
 	-u tests/custom_init.vim \

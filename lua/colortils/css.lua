@@ -209,7 +209,7 @@ function css.list_colors()
         border = require("colortils").settings.border,
         style = "minimal",
     })
-    vim.api.nvim_buf_set_option(buf, "modifiable", false)
+    vim.api.nvim__set_option_value("modifiable", false, { buf = buf })
     -- try to attach colorizer
     pcall(vim.cmd, "ColorizerAttachToBuffer")
 end
